@@ -34,7 +34,7 @@ const ServicesSection = () => {
         
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="text-sm font-bold tracking-[0.2em] text-white uppercase">
+          <span className="text-sm font-bold tracking-[0.2em] text-gray-700 uppercase">
             [ TWT SERVICES ]
           </span>
           <h2 className="mt-4 text-4xl md:text-6xl font-light tracking-tight">
