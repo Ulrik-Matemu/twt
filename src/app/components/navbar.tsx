@@ -7,121 +7,133 @@ import Link from 'next/link';
 // ... (servicesData and featuredService remain the same as your snippet)
 const servicesData = [
 
-{
+  {
 
-category: "Core Services",
+    category: "Core Services",
 
-items: [
+    items: [
 
-{
+      {
 
-icon: Zap,
+        icon: Zap,
 
-title: "Safe Capture of Wild Animals",
+        title: "Safe Capture of Wild Animals",
 
-desc: "Humane capture, transport, and site assessment to safely relocate animals with minimal stress.",
+        desc: "Humane capture, transport, and site assessment to safely relocate animals with minimal stress.",
 
-href: "/our-services/safe-capture-of-wild-animals",
+        href: "/our-services/safe-capture-of-wild-animals",
 
-},
+      },
 
-{
+      {
 
-icon: Shield,
+        icon: Shield,
 
-title: "Wild Animal Rescue",
+        title: "Wild Animal Rescue",
 
-desc: "Rapid-response rescue operations for injured, stranded, or distressed wildlife — returning animals safely to their natural habitat.",
+        desc: "Rapid-response rescue operations for injured, stranded, or distressed wildlife — returning animals safely to their natural habitat.",
 
-href: "/our-services/wild-animal-rescue",
+        href: "/our-services/wild-animal-rescue",
 
-},
+      },
 
-{
+      {
 
-icon: Wrench,
+        icon: Wrench,
 
-title: "Problem Animal Control for Farms & Communities",
+        title: "Problem Animal Control for Farms & Communities",
 
-desc: "Practical, humane solutions for human-wildlife conflict on agricultural land and in communities — protecting livelihoods without harming wildlife.",
+        desc: "Practical, humane solutions for human-wildlife conflict on agricultural land and in communities — protecting livelihoods without harming wildlife.",
 
-href: "/our-services/problem-animal-control",
+        href: "/our-services/problem-animal-control",
 
-},
+      },
 
-{
+      {
 
-icon: Wrench,
+        icon: Wrench,
 
-title: "Expert Zoo Setup & Wildlife Advisory",
+        title: "Expert Zoo Setup & Wildlife Advisory",
 
-desc: "End-to-end expert advisory for designing, establishing, and operating world-class zoo and wildlife facilities across East Africa.",
+        desc: "End-to-end expert advisory for designing, establishing, and operating world-class zoo and wildlife facilities across East Africa.",
 
-href: "/our-services/zoo-setup-and-wildlife-advisory",
+        href: "/our-services/zoo-setup-and-wildlife-advisory",
 
-}
-
-],
-
-},
+      },
 
 {
 
-category: "Solutions",
+        icon: Wrench,
 
-items: [
+        title: "Wildlife Treatment and Care",
 
-{
+        desc: "Specialist veterinary treatment and rehabilitation care for injured and recovering wildlife, delivered by certified professionals in the field and in clinic.",
 
-icon: Globe,
+        href: "/our-services/wildlife-treatment-and-care",
 
-title: "Wildlife Management Support",
+      }
 
-desc: "Strategic and operational wildlife management consulting for game reserves, conservation areas, and protected land managers across East Africa.",
+    ],
 
-href: "/our-services/wildlife-management-support",
+  },
 
-},
+  {
 
-{
+    category: "Solutions",
 
-icon: Users,
+    items: [
 
-title: "Zoo Licensing & Permit Advisory",
+      {
 
-desc: "Expert guidance through Tanzania's wildlife licensing and permitting frameworks for zoos, sanctuaries, educational facilities, and private collections.",
+        icon: Globe,
 
-href: "/our-services/zoo-licensing-and-permit-advisory",
+        title: "Wildlife Management Support",
 
-},
+        desc: "Strategic and operational wildlife management consulting for game reserves, conservation areas, and protected land managers across East Africa.",
 
-{
+        href: "/our-services/wildlife-management-support",
 
-icon: BarChart3,
+      },
 
-title: "Wildlife Handling & Staff Training",
+      {
 
-desc: "Hands-on professional training programs for rangers, game scouts, veterinary staff, and conservation workers in safe, humane wildlife handling.",
+        icon: Users,
 
-href: "/our-services/wildlife-handling-and-staff-training",
+        title: "Zoo Licensing & Permit Advisory",
 
-},
+        desc: "Expert guidance through Tanzania's wildlife licensing and permitting frameworks for zoos, sanctuaries, educational facilities, and private collections.",
 
-{
+        href: "/our-services/zoo-licensing-and-permit-advisory",
 
-icon: BarChart3,
+      },
 
-title: "Wildlife Adaptation & Human Interaction Training",
+      {
 
-desc: "Specialist behavioral conditioning programs for wildlife transitioning to managed environments, and community education to reduce human-wildlife conflict.",
+        icon: BarChart3,
 
-href: "/our-services/wildlife-adaptation-and-human-interaction-training",
+        title: "Wildlife Handling & Staff Training",
 
-},
+        desc: "Hands-on professional training programs for rangers, game scouts, veterinary staff, and conservation workers in safe, humane wildlife handling.",
 
-],
+        href: "/our-services/wildlife-handling-and-staff-training",
 
-},
+      },
+
+      {
+
+        icon: BarChart3,
+
+        title: "Wildlife Adaptation & Human Interaction Training",
+
+        desc: "Specialist behavioral conditioning programs for wildlife transitioning to managed environments, and community education to reduce human-wildlife conflict.",
+
+        href: "/our-services/wildlife-adaptation-and-human-interaction-training",
+
+      },
+
+    ],
+
+  },
 
 ];
 
@@ -129,15 +141,15 @@ href: "/our-services/wildlife-adaptation-and-human-interaction-training",
 
 const featuredService = {
 
-label: "New",
+  label: "New",
 
-title: "Field Intelligence Platform",
+  title: "Field Intelligence Platform",
 
-desc: "Our latest AI-powered platform gives your field teams real-time data, predictive analytics, and seamless coordination tools.",
+  desc: "Our latest AI-powered platform gives your field teams real-time data, predictive analytics, and seamless coordination tools.",
 
-cta: "Explore Platform →",
+  cta: "Explore Platform →",
 
-href: "#",
+  href: "#",
 
 };
 
@@ -177,27 +189,27 @@ const Navbar = () => {
     { name: 'Home', href: '/' },
     { name: 'About Us', href: '/about-us' },
     { name: 'Services', href: '/our-services', hasDropdown: true },
-    { name: 'Field Training', href: '/field-training' },
+    { name: 'Field Projects', href: '/projects' },
+    { name: 'Journal' , href: '/blog' },
     { name: 'Contact', href: '/contact-us' },
   ];
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || isOpen ? 'bg-white shadow-sm py-3' : 'bg-transparent py-5'
-      }`}>
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex items-center justify-between">
-          
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isOpen ? 'bg-white shadow-sm py-3' : 'bg-transparent py-5'
+        }`}>
+        <div className="px-6 sm:px-2 lg:px-12 flex items-center justify-between">
+
           {/* Logo - Fixed width for mobile to prevent layout shift */}
           <div className="flex-1">
             <Link href="/">
-              <div className="relative w-[120px] h-[60px] md:w-[120px] md:h-[60px]">
-                <Image 
-                  src="/twt-logo-removebg-preview.png" 
-                  alt="TWT Logo" 
+              <div className="relative w-[120px] h-[60px] md:w-[160px] md:h-[80px]">
+                <Image
+                  src="/twt-logo-removebg-preview.png"
+                  alt="TWT Logo"
                   fill
                   className="object-contain"
-                  loading="eager" 
+                  loading="eager"
                 />
               </div>
             </Link>
@@ -259,8 +271,8 @@ const Navbar = () => {
 
           {/* Mobile Toggle */}
           <div className="md:hidden flex items-center">
-            <button 
-              onClick={() => setIsOpen(!isOpen)} 
+            <button
+              onClick={() => setIsOpen(!isOpen)}
               className={`p-2 transition-colors ${scrolled || isOpen ? 'text-black' : 'text-white'}`}
               aria-label="Toggle Menu"
             >
@@ -270,9 +282,8 @@ const Navbar = () => {
         </div>
 
         {/* Improved Mobile Menu */}
-        <div className={`absolute top-full left-0 w-full bg-white overflow-hidden transition-all duration-300 ease-in-out md:hidden ${
-          isOpen ? 'max-h-[100vh] border-t border-gray-100 shadow-xl opacity-100' : 'max-h-0 opacity-0'
-        }`}>
+        <div className={`absolute top-full left-0 w-full bg-white overflow-hidden transition-all duration-300 ease-in-out md:hidden ${isOpen ? 'max-h-[100vh] border-t border-gray-100 shadow-xl opacity-100' : 'max-h-0 opacity-0'
+          }`}>
           <div className="p-6 flex flex-col gap-2 max-h-[80vh] overflow-y-auto">
             {navLinks.map((link) => (
               <div key={link.name} className="border-b border-gray-50 last:border-none">
@@ -302,8 +313,8 @@ const Navbar = () => {
                     </div>
                   </div>
                 ) : (
-                  <Link 
-                    href={link.href} 
+                  <Link
+                    href={link.href}
                     className="block py-4 text-xs font-bold uppercase tracking-[0.1em] text-gray-900"
                     onClick={() => setIsOpen(false)}
                   >
@@ -323,7 +334,7 @@ const Navbar = () => {
 
       {/* Overlay to prevent interaction with background and fix the "white space" feel */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsOpen(false)}
         />

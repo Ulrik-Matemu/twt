@@ -94,7 +94,7 @@ export default function ServicesPage() {
           </div>
 
           {/* Tagline strip */}
-          <div className="bg-[#d6852b] px-8 md:px-12 py-3 flex items-center justify-between">
+          <div className="bg-[#d6852b] hidden md:block px-8 md:px-12 py-3 flex items-center justify-between">
             <span className="text-white text-xs font-bold tracking-widest uppercase">
               {featured.tagline}
             </span>
@@ -221,13 +221,13 @@ export default function ServicesPage() {
           </div>
           <div className="flex flex-col gap-3 min-w-[200px]">
             <Link
-              href="/contact"
+              href="/contact-us"
               className="bg-[#d6852b] text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-[#d6852b] transition-colors text-center"
             >
               Get In Touch
             </Link>
             <Link
-              href="/about"
+              href="/about-us"
               className="border border-white/20 text-white/70 px-8 py-4 text-xs font-bold uppercase tracking-widest hover:border-white hover:text-white transition-colors text-center"
             >
               About Our Team

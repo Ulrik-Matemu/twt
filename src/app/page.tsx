@@ -17,10 +17,10 @@ export default function Home() {
   return (
     <main className="">
       <Hero />
-      <StoriesSection />
       <AboutStatsSection />
       <ServicesSection />
       <TestimonialCarousel />
+      <StoriesSection />
       <FAQSection />
       <ParallaxCTA />
     </main>

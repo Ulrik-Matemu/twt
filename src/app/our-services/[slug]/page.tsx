@@ -203,7 +203,7 @@ export default async function ServicePage({ params }: Props) {
                 Can't find the answer? Reach out to our team directly — we're happy to discuss your specific situation.
               </p>
               <Link
-                href="/contact"
+                href="/contact-us"
                 className="inline-flex items-center gap-3 mt-8 bg-[#d6852b] text-white px-7 py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#645958] transition-colors"
               >
                 Contact Us <ArrowRight size={14} />
