@@ -6,6 +6,7 @@ import ServicesSection from "./sections/services-section";
 import TestimonialCarousel from "./sections/testimonials";
 import FAQSection from "./sections/faqs";
 import ParallaxCTA from "./sections/cta";
+import BlogSection from "./sections/blog-section";
 
 export const metadata: Metadata = {
   title: "Wildlife Capture, Relocation & Veterinary Services",
@@ -20,7 +21,7 @@ export default function Home() {
       <AboutStatsSection />
       <ServicesSection />
       <TestimonialCarousel />
-      <StoriesSection />
+      <BlogSection />
       <FAQSection />
       <ParallaxCTA />
     </main>

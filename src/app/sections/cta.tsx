@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const ParallaxCTA = () => {
   return (
@@ -43,9 +44,11 @@ const ParallaxCTA = () => {
           </p>
 
           <div className="mt-6">
+            <Link href='/schedule-consultation'>
             <button className="bg-white text-black px-10 py-4 text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-200 transition-all shadow-2xl">
               Schedule Consultation
             </button>
+            </Link>
           </div>
         </motion.div>
       </div>

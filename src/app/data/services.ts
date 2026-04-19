@@ -186,7 +186,7 @@ export const services: Service[] = [
     title: "Wildlife Treatment and Care",
     shortDescription:
       "Specialist veterinary treatment and rehabilitation care for injured and recovering wildlife, delivered by certified professionals in the field and in clinic.",
-    heroImage: "/services/treatment.jpg",
+    heroImage: "/services/treatment.png",
     tagline: "From Trauma to Recovery.",
     intro:
       "After capture or rescue, many animals require professional medical treatment before they can safely return to the wild. Our wildlife treatment and care services are delivered in partnership with certified wildlife veterinarians and rehabilitation specialists. We manage everything from wound care and fracture stabilization to disease treatment, nutritional rehabilitation, and behavioral conditioning — giving each animal the best possible chance of a full recovery and successful reintegration.",
@@ -552,7 +552,7 @@ export const services: Service[] = [
     title: "Wildlife Adaptation & Human Interaction Training",
     shortDescription:
       "Specialist behavioral conditioning programs for wildlife transitioning to managed environments, and community education to reduce human-wildlife conflict.",
-    heroImage: "/services/adaptation.jpg",
+    heroImage: "/services/adaptation.png",
     tagline: "Teaching Both Sides of the Fence.",
     intro:
       "Helping wildlife adapt to new environments — whether after rescue, relocation, or introduction to a managed facility — requires deep behavioral expertise. At the same time, communities living alongside wildlife need education and practical tools to reduce fear, prevent conflict, and coexist sustainably. Tanzania Wildlife Trappers delivers specialist programs on both sides of this equation, combining applied animal behavior science with culturally grounded community engagement.",

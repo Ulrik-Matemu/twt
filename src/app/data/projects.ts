@@ -31,7 +31,7 @@ export const projects: Project[] = [
     duration: "14 days",
     species: ["African Elephant"],
     outcome: "Successful",
-    heroImage: "/projects/rufiji-elephants.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "A herd of 22 elephants had established a destructive feeding pattern along a critical agricultural corridor bordering the Selous Game Reserve, causing severe crop losses to four farming communities. Over 14 days, our team planned and executed the largest translocation operation in TWT's recent history — safely relocating the entire herd 80km north into undisturbed reserve territory.",
     featured: true,
@@ -54,7 +54,7 @@ export const projects: Project[] = [
     duration: "6 days",
     species: ["African Lion"],
     outcome: "Successful",
-    heroImage: "/projects/ngorongoro-lion.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "A coalition of three male lions repeatedly broke through boma fencing to take livestock from a Maasai community on the NCA boundary. We deployed non-lethal deterrence systems, installed reinforced boma barriers, and facilitated a community compensation and early-warning program that has held for over eight months.",
     stats: [
@@ -76,7 +76,7 @@ export const projects: Project[] = [
     duration: "3 days",
     species: ["African Wild Dog"],
     outcome: "Successful",
-    heroImage: "/projects/wild-dogs.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "Anti-poaching rangers discovered a pack of seven African wild dogs — one of Africa's most endangered canids — with three individuals caught in wire snares. We deployed an emergency rescue team within 6 hours of the callout. All three snared animals were freed, medically assessed, and returned to the pack without permanent injury.",
     stats: [
@@ -98,7 +98,7 @@ export const projects: Project[] = [
     duration: "21 days",
     species: ["Hippopotamus", "Nile Crocodile", "African Fish Eagle"],
     outcome: "Completed",
-    heroImage: "/projects/hippo-waterpoint.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "The prolonged dry season had concentrated an unusually high density of hippos around three remaining waterpoints in the park's eastern section, creating dangerous competition and increasing human-wildlife encounters near park boundaries. We conducted a 21-day waterpoint survey, documented population stress indicators, and delivered a management plan to the park authority.",
     stats: [
@@ -120,7 +120,7 @@ export const projects: Project[] = [
     duration: "2 days",
     species: ["Leopard"],
     outcome: "Successful",
-    heroImage: "/projects/arusha-leopard.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "A young male leopard entered the Arusha urban fringe at night and became cornered in an industrial compound, injuring two workers attempting to chase it out. Our team responded within two hours, safely immobilised the animal at dawn, conducted a full health assessment, and released it in suitable leopard territory 60km from the city.",
     stats: [
@@ -142,7 +142,7 @@ export const projects: Project[] = [
     duration: "5 days",
     species: ["Giraffe", "Zebra", "Wildebeest"],
     outcome: "Completed",
-    heroImage: "/projects/tarangire-training.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "TANAPA commissioned TWT to deliver a structured wildlife handling and emergency response training program for 24 rangers assigned to Tarangire National Park. The five-day program covered species-specific handling, chemical immobilisation awareness, on-field triage, and conflict situation management with live-field practical components.",
     stats: [
@@ -164,7 +164,7 @@ export const projects: Project[] = [
     duration: "8 days",
     species: ["Nile Crocodile"],
     outcome: "Successful",
-    heroImage: "/projects/kilombero-croc.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "Seasonal flooding pushed a population of Nile crocodiles into active rice-farming channels in the Kilombero Valley, resulting in four livestock attacks and a near-miss with a child. We deployed capture and relocation teams, removed eight problem individuals from the farming channels, and delivered community education sessions on waterway safety.",
     stats: [
@@ -186,7 +186,7 @@ export const projects: Project[] = [
     duration: "90 days",
     species: ["Cheetah"],
     outcome: "Successful",
-    heroImage: "/projects/mikumi-cheetah.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "A female cheetah cub, approximately 6 weeks old, was found alone near a poacher's snare line in Mikumi. Our team managed an intensive 90-day rehabilitation program with strict minimal human-contact protocols to preserve wild hunting instincts. The cub was successfully released in a monitored soft-release area and has been confirmed territory-holding for three months.",
     stats: [
@@ -208,7 +208,7 @@ export const projects: Project[] = [
     duration: "30 days",
     species: ["Plains Zebra", "Blue Wildebeest", "Thomson's Gazelle"],
     outcome: "Completed",
-    heroImage: "/projects/serengeti-zebra.jpg",
+    heroImage: "/card-placeholder.png",
     summary:
       "Commissioned by TANAPA and a conservation research partner, TWT led a 30-day ground and aerial survey of zebra populations across the Serengeti's southern corridor — providing baseline data for a five-year management plan. The survey documented 67,400 individuals and identified three previously unrecorded movement corridors.",
     stats: [

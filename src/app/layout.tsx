@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
+import FloatingActions from "./components/floating-actions";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.tanzaniawildlifetrappers.com"),
@@ -45,6 +46,7 @@ export default function RootLayout({
         <div>
           {children}
         </div>
+        <FloatingActions />
         <Footer />
       </body>
     </html>

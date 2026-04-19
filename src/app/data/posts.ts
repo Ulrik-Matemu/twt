@@ -56,7 +56,7 @@ export const posts: Post[] = [
     },
     publishedAt: "2024-03-15",
     readingTime: 9,
-    heroImage: "/blog/hwc-hero.jpg",
+    heroImage: "/card-placeholder.png",
     heroCaption: "A Maasai boma in the Ngorongoro Conservation Area — one of the most complex human-wildlife interfaces in Africa.",
     tags: ["Human-Wildlife Conflict", "Conservation"],
     featured: true,
@@ -204,7 +204,7 @@ export const posts: Post[] = [
     },
     publishedAt: "2024-02-28",
     readingTime: 7,
-    heroImage: "/blog/immobilisation-hero.jpg",
+    heroImage: "/card-placeholder.png",
     heroCaption: "A wildlife veterinarian prepares immobilisation equipment in the Selous Game Reserve.",
     tags: ["Wildlife Science", "Field Notes"],
     seo: {
@@ -331,7 +331,7 @@ export const posts: Post[] = [
     },
     publishedAt: "2024-01-20",
     readingTime: 8,
-    heroImage: "/blog/zoo-standards-hero.jpg",
+    heroImage: "/card-placeholder.png",
     heroCaption: "Modern zoo design prioritises naturalistic environments that support species-appropriate behaviour.",
     tags: ["Legislation", "Conservation"],
     seo: {
@@ -450,7 +450,7 @@ export const posts: Post[] = [
     },
     publishedAt: "2023-12-10",
     readingTime: 5,
-    heroImage: "/blog/injured-animal-hero.jpg",
+    heroImage: "/card-placeholder.png",
     heroCaption: "An injured raptor awaiting professional rescue. Approach and handling of wild birds of prey requires specialist knowledge.",
     tags: ["Field Notes", "Wildlife Science"],
     seo: {
@@ -555,7 +555,7 @@ export const posts: Post[] = [
     },
     publishedAt: "2023-11-05",
     readingTime: 10,
-    heroImage: "/blog/wild-dog-hero.jpg",
+    heroImage: "/card-placeholder.png",
     heroCaption: "An African wild dog pack in the Selous Game Reserve — one of the species' last strongholds in East Africa.",
     tags: ["Species Focus", "Conservation"],
     seo: {
@@ -670,7 +670,7 @@ export const posts: Post[] = [
     },
     publishedAt: "2023-10-18",
     readingTime: 7,
-    heroImage: "/blog/ranger-training-hero.jpg",
+    heroImage: "/card-placeholder.png",
     heroCaption: "TWT field training session at Tarangire National Park, 2023.",
     tags: ["Training", "Conservation"],
     seo: {

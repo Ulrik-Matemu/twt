@@ -18,6 +18,41 @@ const Footer = () => {
     Support: ['FAQs', 'Contact Us', 'Help Center', 'Blog & News']
   };
 
+  // Map link labels to real hrefs (internal or external)
+  const linkPaths: Record<string, string> = {
+    // Company
+    About: '/about-us',
+    Career: '/careers',
+    Reviews: '/reviews',
+    Gallery: '/gallery',
+
+    // Operations
+    Tanzania: '/operations/tanzania',
+    Kenya: '/operations/kenya',
+    Uganda: '/operations/uganda',
+    Rwanda: '/operations/rwanda',
+
+    // QuickAccess
+    Services: '/our-services',
+    Projects: '/projects',
+    'Our Team': '/about-us',
+    Training: '/our-services/wildlife-handling-and-staff-training',
+
+    // Support
+    FAQs: '/help-center',
+    'Contact Us': '/contact-us',
+    'Help Center': '/help-center',
+    'Blog & News': '/blog'
+  };
+
+  // Helper to get href for a link label (falls back to "#")
+  const getHref = (label: string) => linkPaths[label] ?? '#';
+
+  // NOTE: Update the anchor in the rendering section from:
+  //   <a href="#" ...>
+  // to:
+  //   <a href={getHref(link)} ...>
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -69,7 +104,7 @@ const Footer = () => {
               <ul className="flex flex-col gap-4">
                 {links.map(link => (
                   <li key={link}>
-                    <a href="#" className="text-gray-500 hover:text-white transition-colors font-light text-sm flex items-center gap-2">
+                    <a href={getHref(link)} className="text-gray-500 hover:text-white transition-colors font-light text-sm flex items-center gap-2">
                       {link}
                       {link === 'Career' && (
                         <span className="bg-[#556b2f] text-[8px] px-1.5 py-0.5 rounded text-white font-bold">HIRING!</span>

@@ -52,7 +52,7 @@ const Hero = () => {
                 Our Services <ArrowRight size={16} />
               </button>
             </Link>
-            <Link href='/field-projects'>
+            <Link href='/projects'>
               <button className="border border-white/30 text-white px-8 py-4 font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-all transition duration-400 ease-in-out hover:cursor-pointer">
                 View Field Projects
               </button>

@@ -139,12 +139,12 @@ export default function ContactPage() {
           {contactDetails.map((item, i) => (
             <ScrollReveal key={i} delay={i * 0.07}>
               <div className="flex flex-col gap-3 py-10 px-6 first:pl-0 last:pr-0 group">
-                <item.icon size={16} className="text-[#d6852b]" />
-                <span className="text-white/30 text-[10px] font-bold tracking-[0.2em] uppercase">
+                <item.icon size={16} className="text-[#d6852b] md:ml-4" />
+                <span className="text-white/30 text-[10px] font-bold tracking-[0.2em] uppercase md:pl-4">
                   {item.label}
                 </span>
                 {item.lines.map((line, j) => (
-                  <span key={j} className="text-white/80 text-sm leading-snug">
+                  <span key={j} className="text-white/80 text-sm leading-snug md:pl-4">
                     {line}
                   </span>
                 ))}

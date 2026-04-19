@@ -252,7 +252,7 @@ export default async function PostPage({ params }: Props) {
                   Our team is available to discuss your specific situation and recommend the right approach.
                 </p>
                 <Link
-                  href="/contact"
+                  href="/contact-us"
                   className="flex items-center justify-between bg-[#d6852b] text-white px-5 py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors"
                 >
                   Contact Us <ArrowRight size={12} />
