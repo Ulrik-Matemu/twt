@@ -9,11 +9,15 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@posthog/react": "^1.9.0",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "firebase-admin": "^13.8.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
+    "mysql2": "^3.22.3",
     "next": "16.2.1",
+    "posthog-js": "^1.372.5",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

@@ -45,7 +45,7 @@ const ParallaxCTA = () => {
 
           <div className="mt-6">
             <Link href='/schedule-consultation'>
-            <button className="bg-white text-black px-10 py-4 text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-200 transition-all shadow-2xl">
+            <button className="bg-white text-black px-10 py-4 text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-200 hover:cursor-pointer transition-all shadow-2xl">
               Schedule Consultation
             </button>
             </Link>

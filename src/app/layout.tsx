@@ -3,9 +3,10 @@ import "./globals.css";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import FloatingActions from "./components/floating-actions";
+import { PostHogProvider } from "./providers";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.tanzaniawildlifetrappers.com"),
+  metadataBase: new URL("https://www.twt.co.tz"),
   title: {
     default: "Tanzania Wildlife Trappers",
     template: "%s | Tanzania Wildlife Trappers",
@@ -42,12 +43,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        <div>
-          {children}
-        </div>
-        <FloatingActions />
-        <Footer />
+        <PostHogProvider>
+          <Navbar />
+          <div>
+            {children}
+          </div>
+          <FloatingActions />
+          <Footer />
+        </PostHogProvider>
       </body>
     </html>
   );

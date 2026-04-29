@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 
-const WHATSAPP_NUMBER = "255700000000"; // Replace with real number
+const WHATSAPP_NUMBER = "255750151020"; // Replace with real number
 const WHATSAPP_MESSAGE = "Hello, I'd like to enquire about Tanzania Wildlife Trappers services.";
 
 export default function FloatingActions() {

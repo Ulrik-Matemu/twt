@@ -15,12 +15,12 @@ const contactDetails = [
   {
     icon: Phone,
     label: "Emergency Line",
-    lines: ["+255 700 000 000", "Available 24 / 7"],
+    lines: ["+255 750 151 020", "Available 24 / 7"],
   },
   {
     icon: Mail,
     label: "General Enquiries",
-    lines: ["info@tanzaniawildlifetrappers.com"],
+    lines: ["info@twt.co.tz"],
   },
   {
     icon: Clock,
@@ -88,16 +88,39 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const errs = validate();
+
     if (Object.keys(errs).length) {
       setErrors(errs);
       return;
     }
-    setLoading(true);
-    // Simulate network request
-    await new Promise((r) => setTimeout(r, 1400));
-    setLoading(false);
-    setSubmitted(true);
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/contact-message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to send message. Please try again.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Contact submit error:", error);
+      alert("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -188,10 +211,10 @@ export default function ContactPage() {
                   Emergency Line
                 </p>
                 <a
-                  href="tel:+255700000000"
+                  href="tel:+255 750 151 020"
                   className="text-[#1a1a1a] text-2xl font-bold hover:text-[#d6852b] transition-colors"
                 >
-                  +255 700 000 000
+                  +255 750 151 020
                 </a>
                 <p className="text-gray-400 text-xs mt-1">Available 24 hours a day</p>
               </div>

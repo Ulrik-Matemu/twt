@@ -1,14 +1,18 @@
 "use client";
 
-import React from 'react';
-import {  
-  PhoneCall, 
-  Mail, 
-  ArrowUp 
+import React, { useState } from 'react';
+import {
+  PhoneCall,
+  Mail,
+  ArrowUp
 } from 'lucide-react';
 import Image from 'next/image';
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
@@ -57,10 +61,51 @@ const Footer = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!email.trim()) {
+      setMessage("Please enter your email address.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.error || "Subscription failed. Please try again.");
+        return;
+      }
+
+      setMessage(
+        data.alreadyExists
+          ? "You're already subscribed."
+          : "Thank you for subscribing."
+      );
+
+      setEmail("");
+    } catch {
+      setMessage("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <footer className="bg-[#121212] text-white pt-20 pb-10 px-6 lg:px-12 relative">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Top Bar: Socials and Contact */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 pb-12 border-b border-white/10">
           {/* <div className="flex items-center gap-6">
@@ -90,7 +135,7 @@ const Footer = () => {
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-gray-500">Mail us at</p>
-                <p className="text-lg font-light">tanzaniawildlifetrappers@hotmail.com</p>
+                <p className="text-lg font-light">info@twt.co.tz</p>
               </div>
             </div>
           </div>
@@ -119,16 +164,27 @@ const Footer = () => {
           {/* Newsletter Column */}
           <div className="col-span-2 flex flex-col gap-6">
             <h4 className="text-sm font-bold uppercase tracking-widest text-gray-200">Subscribe To Our Newsletter</h4>
-            <div className="flex">
-              <input 
-                type="email" 
-                placeholder="e.g. hello@twt.com" 
+            <form onSubmit={handleNewsletterSubmit} className="flex">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="e.g. hello@twt.co.tz"
                 className="bg-white/5 border border-white/10 px-4 py-4 w-full text-sm outline-none focus:border-white/30 transition-all"
               />
-              <button className="bg-[#d6852b] hover:bg-gray-500 px-8 py-4 text-[10px] font-bold uppercase tracking-widest transition-all">
-                Subscribe
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-[#d6852b] hover:bg-gray-500 px-8 py-4 text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-60"
+              >
+                {loading ? "..." : "Subscribe"}
               </button>
-            </div>
+            </form>
+            {message && (
+              <p className="text-xs text-gray-400">
+                {message}
+              </p>
+            )}
             <p className="text-xs text-gray-500 leading-relaxed italic">
               Join our network for field updates, wildlife relocation reports, and seasonal training opportunities.
             </p>
@@ -138,13 +194,13 @@ const Footer = () => {
         {/* Bottom Bar: Logo and Legal */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-white/10 gap-6">
           <div className="flex items-center gap-3">
-           <Image
-                src="/twt-logo-removebg-preview.png"
-                alt="TWT Logo"
-                width={40}
-                height={20}
-                loading='eager'
-              />
+            <Image
+              src="/twt-logo-removebg-preview.png"
+              alt="TWT Logo"
+              width={40}
+              height={20}
+              loading='eager'
+            />
             <span className="font-bold tracking-tighter text-xl">
               TANZANIA WILDLIFE<span className="font-light"> TRAPPERS</span>
             </span>
@@ -155,7 +211,7 @@ const Footer = () => {
           </p>
         </div>
 
-        
+
       </div>
     </footer>
   );

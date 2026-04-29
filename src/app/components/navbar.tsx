@@ -247,7 +247,7 @@ const Navbar = () => {
           {/* Desktop CTA */}
           <div className="hidden md:flex justify-end flex-shrink-0">
             <Link href='/schedule-consultation'>
-              <button className="bg-black text-white px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-[#d6852b] transition-all duration-300">
+              <button className="bg-black text-white px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-[#d6852b] hover:cursor-pointer transition-all duration-300">
                 Get Started
               </button>
             </Link>

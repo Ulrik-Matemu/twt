@@ -1,1 +1,52 @@
 @import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────
+   Add everything below to your app/globals.css file,
+   after your existing @import "tailwindcss" line.
+
+   You are on Tailwind CSS v4 (Next.js 14+), which has no
+   tailwind.config.ts — all customisation lives here in CSS.
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── Custom keyframes ───────────────────────────────────────────── */
+
+@keyframes loading-bar {
+  0%   { width: 0%;   opacity: 1; }
+  70%  { width: 85%;  opacity: 1; }
+  90%  { width: 95%;  opacity: 0.7; }
+  100% { width: 100%; opacity: 0; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ── Register the custom utility with Tailwind v4 ───────────────── */
+/*
+   @utility lets you use animate-loading-bar as a Tailwind class
+   exactly like animate-pulse or animate-spin — no config file needed.
+*/
+
+@utility animate-loading-bar {
+  animation: loading-bar 1.8s ease-in-out infinite;
+}
+
+/* ── Shimmer helper class ───────────────────────────────────────── */
+/*
+   bg-shimmer is used as a plain CSS class (not a Tailwind utility)
+   on the overlay divs inside the loading skeleton. No @utility
+   declaration needed — just drop className="bg-shimmer" on any element.
+*/
+
+.bg-shimmer {
+  background: linear-gradient(
+    105deg,
+    transparent          40%,
+    rgba(214,133,43,0.04) 50%,
+    rgba(255,255,255,0.03) 55%,
+    transparent          65%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.2s ease-in-out infinite;
+}

@@ -130,31 +130,31 @@ const URGENCY_OPTIONS: {
   desc: string;
   color: string;
 }[] = [
-  {
-    value: "emergency",
-    label: "Emergency",
-    desc: "Animal present now — immediate intervention required",
-    color: "border-red-400 bg-red-900/20 text-red-300",
-  },
-  {
-    value: "urgent",
-    label: "Urgent",
-    desc: "Response needed within 24–48 hours",
-    color: "border-orange-400 bg-orange-900/20 text-orange-300",
-  },
-  {
-    value: "planned",
-    label: "Planned",
-    desc: "Scheduled operation within the coming weeks",
-    color: "border-blue-400 bg-blue-900/20 text-blue-300",
-  },
-  {
-    value: "advisory",
-    label: "Advisory",
-    desc: "Consultation or planning — no immediate time pressure",
-    color: "border-green-400 bg-green-900/20 text-green-300",
-  },
-];
+    {
+      value: "emergency",
+      label: "Emergency",
+      desc: "Animal present now — immediate intervention required",
+      color: "border-red-400 bg-red-900/20 text-red-300",
+    },
+    {
+      value: "urgent",
+      label: "Urgent",
+      desc: "Response needed within 24–48 hours",
+      color: "border-orange-400 bg-orange-900/20 text-orange-300",
+    },
+    {
+      value: "planned",
+      label: "Planned",
+      desc: "Scheduled operation within the coming weeks",
+      color: "border-blue-400 bg-blue-900/20 text-blue-300",
+    },
+    {
+      value: "advisory",
+      label: "Advisory",
+      desc: "Consultation or planning — no immediate time pressure",
+      color: "border-green-400 bg-green-900/20 text-green-300",
+    },
+  ];
 
 const STEPS = [
   { number: "01", label: "Request Type" },
@@ -174,14 +174,14 @@ export default function SchedulePage() {
 
   const set =
     (field: keyof FormData) =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ) => {
-      setForm((p) => ({ ...p, [field]: e.target.value }));
-      if (errors[field]) setErrors((p) => ({ ...p, [field]: "" }));
-    };
+      (
+        e: React.ChangeEvent<
+          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
+      ) => {
+        setForm((p) => ({ ...p, [field]: e.target.value }));
+        if (errors[field]) setErrors((p) => ({ ...p, [field]: "" }));
+      };
 
   const setDirect = (field: keyof FormData, value: string) => {
     setForm((p) => ({ ...p, [field]: value }));
@@ -233,12 +233,38 @@ export default function SchedulePage() {
 
   const submit = async () => {
     const e = validateStep(3);
-    if (Object.keys(e).length) { setErrors(e); return; }
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1600));
-    setLoading(false);
-    setSubmitted(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (Object.keys(e).length) {
+      setErrors(e);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/schedule-request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to submit request. Please try again.");
+        return;
+      }
+
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error("Submit error:", error);
+      alert("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isEmergency = form.urgency === "emergency";
@@ -287,10 +313,10 @@ export default function SchedulePage() {
                       Don't wait for a form. Call our 24/7 emergency line immediately.
                     </p>
                     <a
-                      href="tel:+255700000000"
+                      href="tel:+255750151020"
                       className="text-white text-lg font-bold hover:text-[#d6852b] transition-colors block"
                     >
-                      +255 700 000 000
+                      +255 750 151 020
                     </a>
                   </div>
                 </div>
@@ -311,43 +337,39 @@ export default function SchedulePage() {
                 return (
                   <div
                     key={i}
-                    className={`flex items-center gap-3 px-6 py-5 flex-shrink-0 border-b-2 transition-all duration-300 ${
-                      isActive
+                    className={`flex items-center gap-3 px-6 py-5 flex-shrink-0 border-b-2 transition-all duration-300 ${isActive
                         ? "border-[#d6852b]"
                         : isDone
-                        ? "border-[#d6852b]/40"
-                        : "border-transparent"
-                    }`}
+                          ? "border-[#d6852b]/40"
+                          : "border-transparent"
+                      }`}
                   >
                     <div
-                      className={`w-7 h-7 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                        isDone
+                      className={`w-7 h-7 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${isDone
                           ? "bg-[#d6852b]"
                           : isActive
-                          ? "border-2 border-[#d6852b]"
-                          : "border border-white/20"
-                      }`}
+                            ? "border-2 border-[#d6852b]"
+                            : "border border-white/20"
+                        }`}
                     >
                       {isDone ? (
                         <CheckCircle size={13} className="text-white" />
                       ) : (
                         <span
-                          className={`text-[10px] font-bold ${
-                            isActive ? "text-[#d6852b]" : "text-white/30"
-                          }`}
+                          className={`text-[10px] font-bold ${isActive ? "text-[#d6852b]" : "text-white/30"
+                            }`}
                         >
                           {s.number}
                         </span>
                       )}
                     </div>
                     <span
-                      className={`text-xs font-bold uppercase tracking-widest transition-colors duration-300 ${
-                        isActive
+                      className={`text-xs font-bold uppercase tracking-widest transition-colors duration-300 ${isActive
                           ? "text-white"
                           : isDone
-                          ? "text-white/50"
-                          : "text-white/20"
-                      }`}
+                            ? "text-white/50"
+                            : "text-white/20"
+                        }`}
                     >
                       {s.label}
                     </span>
@@ -491,8 +513,8 @@ export default function SchedulePage() {
                 </p>
                 <div className="flex flex-col gap-4">
                   {[
-                    { icon: Phone, label: "Emergency Line", value: "+255 700 000 000", href: "tel:+255700000000" },
-                    { icon: Mail, label: "General Enquiries", value: "info@tanzaniawildlifetrappers.com", href: "mailto:info@tanzaniawildlifetrappers.com" },
+                    { icon: Phone, label: "Emergency Line", value: "+255 750 151 020", href: "tel:+255750151020" },
+                    { icon: Mail, label: "General Enquiries", value: "info@twt.co.tz", href: "mailto:info@twt.co.tz" },
                     { icon: MapPin, label: "Field Base", value: "Arusha, Tanzania", href: null },
                     { icon: Clock, label: "Office Hours", value: "Mon–Fri 08:00–17:00", href: null },
                   ].map((c, i) => (
@@ -612,22 +634,19 @@ function Step1({
               key={opt.value}
               type="button"
               onClick={() => setDirect("requestType", opt.value)}
-              className={`group text-left p-5 border-2 transition-all duration-300 ${
-                form.requestType === opt.value
+              className={`group text-left p-5 border-2 transition-all duration-300 ${form.requestType === opt.value
                   ? "border-[#d6852b] bg-[#d6852b]/5"
                   : "border-[#1a1a1a]/10 hover:border-[#d6852b]/40"
-              }`}
+                }`}
             >
               <opt.icon
                 size={18}
-                className={`mb-3 transition-colors ${
-                  form.requestType === opt.value ? "text-[#d6852b]" : "text-[#1a1a1a]/30"
-                }`}
+                className={`mb-3 transition-colors ${form.requestType === opt.value ? "text-[#d6852b]" : "text-[#1a1a1a]/30"
+                  }`}
               />
               <p
-                className={`text-sm font-bold uppercase tracking-wide mb-1.5 transition-colors ${
-                  form.requestType === opt.value ? "text-[#d6852b]" : "text-[#1a1a1a]"
-                }`}
+                className={`text-sm font-bold uppercase tracking-wide mb-1.5 transition-colors ${form.requestType === opt.value ? "text-[#d6852b]" : "text-[#1a1a1a]"
+                  }`}
               >
                 {opt.title}
               </p>
@@ -662,11 +681,10 @@ function Step1({
               key={opt.value}
               type="button"
               onClick={() => setDirect("urgency", opt.value)}
-              className={`text-left p-4 border-2 transition-all duration-200 ${
-                form.urgency === opt.value
+              className={`text-left p-4 border-2 transition-all duration-200 ${form.urgency === opt.value
                   ? opt.color
                   : "border-[#1a1a1a]/10 hover:border-[#1a1a1a]/30"
-              }`}
+                }`}
             >
               <p className="text-sm font-bold uppercase tracking-wide mb-1">
                 {opt.label}
@@ -876,11 +894,10 @@ function Step4({
               key={fmt}
               type="button"
               onClick={() => setDirect("meetingFormat", fmt)}
-              className={`text-left px-4 py-3 border-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 ${
-                form.meetingFormat === fmt
+              className={`text-left px-4 py-3 border-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 ${form.meetingFormat === fmt
                   ? "border-[#d6852b] bg-[#d6852b]/5 text-[#d6852b]"
                   : "border-[#1a1a1a]/10 text-[#1a1a1a]/60 hover:border-[#d6852b]/40 hover:text-[#1a1a1a]"
-              }`}
+                }`}
             >
               {fmt}
             </button>
@@ -924,11 +941,10 @@ function Step4({
               key={slot}
               type="button"
               onClick={() => setDirect("preferredTime", slot)}
-              className={`text-center px-3 py-3 border-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 ${
-                form.preferredTime === slot
+              className={`text-center px-3 py-3 border-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 ${form.preferredTime === slot
                   ? "border-[#d6852b] bg-[#d6852b]/5 text-[#d6852b]"
                   : "border-[#1a1a1a]/10 text-[#1a1a1a]/60 hover:border-[#d6852b]/40 hover:text-[#1a1a1a]"
-              }`}
+                }`}
             >
               {slot}
             </button>
@@ -1013,8 +1029,8 @@ function SuccessState({ form }: { form: FormData }) {
       <p className="text-gray-400 text-sm leading-relaxed max-w-lg">
         If your situation is urgent or has escalated, please call our emergency line
         directly —{" "}
-        <a href="tel:+255700000000" className="text-[#d6852b] font-semibold">
-          +255 700 000 000
+        <a href="tel:+255750151020" className="text-[#d6852b] font-semibold">
+          +255 750 151 020
         </a>{" "}
         — available 24 hours a day.
       </p>

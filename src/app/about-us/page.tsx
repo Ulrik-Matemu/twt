@@ -136,7 +136,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── MISSION STATEMENT ─────────────────────────────────────── */}
-      <section className="bg-[#f9f5ef] py-24 px-6 lg:px-16">
+      <section className="bg-[#f9f5ef] py-24 px-6 lg:px-16" id="mission-section">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
             {/* Left label */}

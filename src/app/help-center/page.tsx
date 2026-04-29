@@ -93,7 +93,7 @@ const articles: Article[] = [
     categoryId: "getting-started",
     question: "How do I request a service from Tanzania Wildlife Trappers?",
     answer:
-      "The fastest way to engage TWT is through our Schedule & Request page, where you can submit a detailed service or consultation request directly. A member of our team reviews every submission personally and responds within one business day. For urgent or emergency situations, please call our 24/7 emergency line at +255 700 000 000 — do not wait for a form response.",
+      "The fastest way to engage TWT is through our Schedule & Request page, where you can submit a detailed service or consultation request directly. A member of our team reviews every submission personally and responds within one business day. For urgent or emergency situations, please call our 24/7 emergency line at +255 750 151 020 — do not wait for a form response.",
     tags: ["request", "booking", "first time"],
   },
   {
@@ -177,7 +177,7 @@ const articles: Article[] = [
     categoryId: "emergency",
     question: "There is a dangerous wild animal near people right now — what do I do?",
     answer:
-      "Call our emergency line immediately: +255 700 000 000. While waiting: keep all people and domestic animals away from the wild animal — maintain at least 50 metres where possible. Do not attempt to chase, corner, or touch the animal. Do not throw objects. Keep children indoors. If the animal is inside a building, close doors to limit its movement. Our team will give you real-time guidance on the phone while deploying.",
+      "Call our emergency line immediately: +255 750 151 020. While waiting: keep all people and domestic animals away from the wild animal — maintain at least 50 metres where possible. Do not attempt to chase, corner, or touch the animal. Do not throw objects. Keep children indoors. If the animal is inside a building, close doors to limit its movement. Our team will give you real-time guidance on the phone while deploying.",
     tags: ["emergency", "dangerous", "immediate danger"],
   },
   {
@@ -201,7 +201,7 @@ const articles: Article[] = [
     categoryId: "emergency",
     question: "Is your emergency line really available 24 hours a day?",
     answer:
-      "Yes. Our emergency line — +255 700 000 000 — is staffed around the clock, every day of the year including public holidays. Wildlife situations do not follow office hours, and neither do we. If you call and the line is temporarily engaged, stay on — you will be connected or called back within minutes.",
+      "Yes. Our emergency line — +255 750 151 020 — is staffed around the clock, every day of the year including public holidays. Wildlife situations do not follow office hours, and neither do we. If you call and the line is temporarily engaged, stay on — you will be connected or called back within minutes.",
     tags: ["24/7", "hours", "availability"],
   },
 
@@ -593,23 +593,23 @@ export default function HelpPage() {
                     {
                       icon: Phone,
                       label: "Emergency Line",
-                      value: "+255 700 000 000",
+                      value: "+255 750 151 020",
                       sub: "Available 24/7",
-                      href: "tel:+255700000000",
+                      href: "tel:+255750151020",
                     },
                     {
                       icon: Mail,
                       label: "General Enquiries",
-                      value: "info@tanzaniawildlifetrappers.com",
+                      value: "info@twt.co.tz",
                       sub: "Response within 1 business day",
-                      href: "mailto:info@tanzaniawildlifetrappers.com",
+                      href: "mailto:info@twt.co.tz",
                     },
                     {
                       icon: MessageCircle,
                       label: "WhatsApp",
                       value: "Chat with our team",
                       sub: "Typically replies within 1 hour",
-                      href: "https://wa.me/255700000000",
+                      href: "https://wa.me/255750151020",
                     },
                   ].map((c, i) => (
                     <a
@@ -667,7 +667,7 @@ export default function HelpPage() {
                     { label: "Our Services", href: "/our-services" },
                     { label: "Field Projects", href: "/projects" },
                     { label: "Careers", href: "/careers" },
-                    { label: "About Us", href: "/about" },
+                    { label: "About Us", href: "/about-us" },
                     { label: "Contact", href: "/contact-us" },
                   ].map((l) => (
                     <Link

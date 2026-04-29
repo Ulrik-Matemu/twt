@@ -74,8 +74,8 @@ export const countries: CountryOperation[] = [
     presenceType: "Headquarters",
     contact: {
       office: "Arusha, Tanzania (Headquarters) · Dar es Salaam (Regional Office)",
-      phone: "+255 700 000 000",
-      email: "tanzania@tanzaniawildlifetrappers.com",
+      phone: "+255 750 151 020",
+      email: "info@twt.co.tz",
       whatsapp: "255700000000",
     },
     stats: [
@@ -90,7 +90,7 @@ export const countries: CountryOperation[] = [
         type: "Savanna / Grassland",
         description:
           "The Serengeti is the stage for the world's largest terrestrial wildlife migration — 1.5 million wildebeest, 500,000 zebra, and 300,000 Thomson's gazelle moving in an annual circuit across the Tanzania-Kenya border. It is also home to one of Africa's densest lion populations and a stronghold for cheetah, leopard, and African wild dog.",
-        image: "/countries/tz-serengeti.jpg",
+        image: "/card-placeholder.png",
         species: [
           "African Lion",
           "Cheetah",
@@ -105,7 +105,7 @@ export const countries: CountryOperation[] = [
         type: "Miombo Woodland / Riverine Forest",
         description:
           "The Nyerere National Park and surrounding Selous Game Reserve form the largest protected area in Africa. It holds the continent's largest elephant population and the world's most significant wild dog stronghold. TWT has an extensive operational history in the Selous spanning over two decades.",
-        image: "/countries/tz-selous.jpg",
+        image: "/card-placeholder.png",
         species: [
           "African Elephant",
           "African Wild Dog",
@@ -120,7 +120,7 @@ export const countries: CountryOperation[] = [
         type: "Miombo / Seasonal Wetlands",
         description:
           "Central Tanzania's great wilderness, Ruaha holds East Africa's largest lion population and critical elephant corridors linking the southern and central highlands. The adjacent Katavi holds one of Africa's most undisturbed hippo and crocodile populations.",
-        image: "/countries/tz-ruaha.jpg",
+        image: "/card-placeholder.png",
         species: [
           "African Lion",
           "African Elephant",
@@ -252,7 +252,7 @@ export const countries: CountryOperation[] = [
         type: "Savanna / Grassland",
         description:
           "The Mara is where the great migration climaxes — wildebeest and zebra crossing the Mara River in one of nature's most dramatic spectacles. Beyond the migration, the Mara ecosystem sustains extraordinary big cat densities: cheetahs, leopards, and lions at some of Africa's highest recorded concentrations.",
-        image: "/countries/ke-mara.jpg",
+        image: "card-placeholder.png",
         species: [
           "African Lion",
           "Cheetah",
@@ -282,7 +282,7 @@ export const countries: CountryOperation[] = [
         type: "Semi-Arid Savanna / Thorn Scrub",
         description:
           "Kenya's largest protected area complex, Tsavo holds the largest elephant population in the country. Its vast landscape is also home to a significant lion population, red-dusted from the laterite soils, and critical migratory corridors between the coast and the interior.",
-        image: "/countries/ke-tsavo.jpg",
+        image: "/card-placeholder.png",
         species: [
           "African Elephant",
           "African Lion",
@@ -416,7 +416,7 @@ export const countries: CountryOperation[] = [
         type: "Montane Rainforest",
         description:
           "Bwindi Impenetrable National Park and the adjacent Mgahinga Gorilla National Park together shelter more than half of the world's surviving mountain gorillas — approximately 460 individuals. The landscape also hosts significant populations of forest elephants, chimpanzees, L'Hoest's monkeys, and over 350 bird species. Working in this ecosystem requires specialist primate expertise and strict disease prevention protocols.",
-        image: "/countries/ug-bwindi.jpg",
+        image: "/card-placeholder.png",
         species: [
           "Mountain Gorilla",
           "Chimpanzee",
@@ -431,7 +431,7 @@ export const countries: CountryOperation[] = [
         type: "Savanna / Riverine Forest / Wetland",
         description:
           "Uganda's largest national park, Murchison Falls sits at the northern end of the Albertine Rift. The Nile flows through the park, creating a spectacular waterfall and a riverine system that sustains extraordinary concentrations of hippos, Nile crocodiles, and elephants. The northern bank supports Uganda's most significant lion population.",
-        image: "/countries/ug-murchison.jpg",
+        image: "/card-placeholder.png",
         species: [
           "African Elephant",
           "African Lion",
@@ -580,7 +580,7 @@ export const countries: CountryOperation[] = [
         type: "Afromontane Forest",
         description:
           "Volcanoes National Park encompasses the Rwandan sector of the Virunga Massif — a chain of dormant and active volcanoes straddling the Rwanda-DRC-Uganda border. It is home to approximately 604 mountain gorillas across multiple habituated and unhabituated family groups, in addition to golden monkeys, forest buffalo, and a remarkable high-altitude endemic flora. It is one of the most intensively managed and monitored wildlife areas on Earth.",
-        image: "/countries/rw-volcanoes.jpg",
+        image: "/card-placeholder.png",
         species: [
           "Mountain Gorilla",
           "Golden Monkey",
@@ -595,7 +595,7 @@ export const countries: CountryOperation[] = [
         type: "Savanna / Wetland Complex",
         description:
           "Akagera is one of East Africa's great conservation comeback stories. Heavily degraded after the 1994 genocide, the park has been systematically restored under Rwanda Development Board and African Parks management — with the reintroduction of lions in 2015 and black rhinos in 2017. It is now the only Big Five park in Rwanda and a model for collaborative conservation management.",
-        image: "/countries/rw-akagera.jpg",
+        image: "/card-placeholder.png",
         species: [
           "African Lion",
           "Black Rhinoceros",
@@ -610,7 +610,7 @@ export const countries: CountryOperation[] = [
         type: "Montane Rainforest",
         description:
           "Nyungwe is one of Africa's oldest and most biodiverse montane rainforests, covering the Congo-Nile divide in Rwanda's southwestern highlands. It harbours 13 primate species including chimpanzees and Angola colobus monkeys in groups of up to 400 — the largest primate troops in East Africa.",
-        image: "/countries/rw-nyungwe.jpg",
+        image: "/card-placeholder.png",
         species: [
           "Chimpanzee",
           "Angola Colobus",
