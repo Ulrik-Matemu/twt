@@ -17,6 +17,18 @@ export async function POST(req: Request) {
       );
     }
 
+    if (
+      typeof body.name !== "string" ||
+      typeof body.email !== "string" ||
+      typeof body.enquiryType !== "string" ||
+      typeof body.message !== "string"
+    ) {
+      return NextResponse.json(
+        { error: "Invalid input types" },
+        { status: 400 }
+      );
+    }
+
     const messageId = await saveContactMessage(body);
 
     return NextResponse.json({ success: true, messageId });
