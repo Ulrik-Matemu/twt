@@ -4,6 +4,8 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import FloatingActions from "./components/floating-actions";
 import { PostHogProvider } from "./providers";
+import { Suspense } from "react";
+import NavigationProgress from "./components/NavigationProgress";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.twt.co.tz"),
@@ -43,6 +45,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <PostHogProvider>
           <Navbar />
           <div>
