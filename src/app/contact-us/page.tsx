@@ -20,7 +20,7 @@ const contactDetails = [
   {
     icon: Mail,
     label: "General Enquiries",
-    lines: ["info@twt.co.tz"],
+    lines: ["office@twt.co.tz"],
   },
   {
     icon: Clock,

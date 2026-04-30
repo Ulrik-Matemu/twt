@@ -600,9 +600,9 @@ export default function HelpPage() {
                     {
                       icon: Mail,
                       label: "General Enquiries",
-                      value: "info@twt.co.tz",
+                      value: "office@twt.co.tz",
                       sub: "Response within 1 business day",
-                      href: "mailto:info@twt.co.tz",
+                      href: "mailto:office@twt.co.tz",
                     },
                     {
                       icon: MessageCircle,

@@ -514,7 +514,7 @@ export default function SchedulePage() {
                 <div className="flex flex-col gap-4">
                   {[
                     { icon: Phone, label: "Emergency Line", value: "+255 750 151 020", href: "tel:+255750151020" },
-                    { icon: Mail, label: "General Enquiries", value: "info@twt.co.tz", href: "mailto:info@twt.co.tz" },
+                    { icon: Mail, label: "General Enquiries", value: "office@twt.co.tz", href: "mailto:office@twt.co.tz" },
                     { icon: MapPin, label: "Field Base", value: "Arusha, Tanzania", href: null },
                     { icon: Clock, label: "Office Hours", value: "Mon–Fri 08:00–17:00", href: null },
                   ].map((c, i) => (

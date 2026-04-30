@@ -75,7 +75,7 @@ export const countries: CountryOperation[] = [
     contact: {
       office: "Arusha, Tanzania (Headquarters) · Dar es Salaam (Regional Office)",
       phone: "+255 750 151 020",
-      email: "info@twt.co.tz",
+      email: "office@twt.co.tz",
       whatsapp: "255700000000",
     },
     stats: [

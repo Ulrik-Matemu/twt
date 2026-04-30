@@ -135,7 +135,7 @@ const Footer = () => {
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-gray-500">Mail us at</p>
-                <p className="text-lg font-light">info@twt.co.tz</p>
+                <p className="text-lg font-light">office@twt.co.tz</p>
               </div>
             </div>
           </div>
