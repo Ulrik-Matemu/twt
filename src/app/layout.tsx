@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "./components/navbar";
-import Footer from "./components/footer";
-import FloatingActions from "./components/floating-actions";
+import SiteChrome from "./components/SiteChrome";
 import { PostHogProvider } from "./providers";
 import { Suspense } from "react";
 import NavigationProgress from "./components/NavigationProgress";
+import PageLoadingBadge from "./components/PageLoadingBadge";
+import { NavigationLoadingProvider } from "./components/NavigationLoadingContext";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.twt.co.tz"),
@@ -46,16 +46,14 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <Suspense fallback={null}>
-          <NavigationProgress />
+          <NavigationLoadingProvider>
+            <NavigationProgress />
+            <PageLoadingBadge />
+            <PostHogProvider>
+              <SiteChrome>{children}</SiteChrome>
+            </PostHogProvider>
+          </NavigationLoadingProvider>
         </Suspense>
-        <PostHogProvider>
-          <Navbar />
-          <div>
-            {children}
-          </div>
-          <FloatingActions />
-          <Footer />
-        </PostHogProvider>
       </body>
     </html>
   );
