@@ -5,7 +5,9 @@ import { getSessionUser, hasRole, requireRole } from "@/lib/portal-auth";
 import {
   REPORT_AUTHOR_ROLES,
   REVIEWER_ROLES,
+  type ReportEntryInput,
   type ReportInput,
+  type SubUnitEntryInput,
   type ZooCensusReportInput,
 } from "@/lib/portal-types";
 import {
@@ -21,6 +23,8 @@ import {
   validateZooGeneralDetails,
 } from "@/lib/zoo-report-helpers";
 import { logActivity } from "@/lib/activity-log";
+import { generateCaptureReportPdf, generateZooCensusReportPdf } from "@/lib/pdf/report-pdf";
+import { sendReportSubmissionEmail } from "@/lib/resend-email";
 
 export async function GET() {
   const user = await getSessionUser();
@@ -109,6 +113,29 @@ export async function POST(req: Request) {
         summary: `${isDraft ? "Saved draft" : "Submitted"} zoo census report for ${unit} (${date})`,
       });
 
+      if (!isDraft) {
+        // The report is already saved at this point — a PDF/email hiccup
+        // must never turn into an error response for an already-successful
+        // submission, so this is isolated from the outer try/catch.
+        try {
+          const pdfBuffer = await generateZooCensusReportPdf(
+            { date, unit, observerName: user.name, status: "submitted" },
+            subUnitEntries as SubUnitEntryInput[]
+          );
+          await sendReportSubmissionEmail({
+            reportType: "Zoo Census Report",
+            observerName: user.name,
+            date,
+            location: unit,
+            reportId: reportRef.id,
+            pdfBuffer,
+            portalOrigin: new URL(req.url).origin,
+          });
+        } catch (emailError) {
+          console.error("Report submission email failed:", emailError);
+        }
+      }
+
       return NextResponse.json({ success: true, reportId: reportRef.id });
     }
 
@@ -161,6 +188,26 @@ export async function POST(req: Request) {
       targetId: reportRef.id,
       summary: `${isDraft ? "Saved draft" : "Submitted"} report for ${project} · ${site} (${date})`,
     });
+
+    if (!isDraft) {
+      try {
+        const pdfBuffer = await generateCaptureReportPdf(
+          { date, project, site, observerName: user.name, status: "submitted" },
+          entries as ReportEntryInput[]
+        );
+        await sendReportSubmissionEmail({
+          reportType: "Capture Report",
+          observerName: user.name,
+          date,
+          location: `${project} · ${site}`,
+          reportId: reportRef.id,
+          pdfBuffer,
+          portalOrigin: new URL(req.url).origin,
+        });
+      } catch (emailError) {
+        console.error("Report submission email failed:", emailError);
+      }
+    }
 
     return NextResponse.json({ success: true, reportId: reportRef.id });
   } catch (error) {

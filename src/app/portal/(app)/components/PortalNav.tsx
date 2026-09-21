@@ -10,20 +10,23 @@ import {
   Users,
   History,
   Trees,
+  HelpCircle,
 } from "lucide-react";
 import type { PortalRole } from "@/lib/portal-types";
 import LogoutButton from "./LogoutButton";
+import { useTour } from "./tour/TourProvider";
 
 interface NavItem {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   roles?: PortalRole[];
+  tourId?: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/portal", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/portal/reports", label: "Reports", icon: ClipboardList },
+  { href: "/portal", label: "Dashboard", icon: LayoutDashboard, tourId: "nav-dashboard" },
+  { href: "/portal/reports", label: "Reports", icon: ClipboardList, tourId: "nav-reports" },
   {
     href: "/portal/animals",
     label: "Animals",
@@ -52,6 +55,7 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function PortalNav({ role, name }: { role: PortalRole; name: string }) {
   const pathname = usePathname();
+  const { start } = useTour();
 
   const items = NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(role));
 
@@ -81,6 +85,7 @@ export default function PortalNav({ role, name }: { role: PortalRole; name: stri
               <Link
                 key={item.href}
                 href={item.href}
+                data-tour-id={item.tourId}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   active
                     ? "bg-[#d6852b]/10 text-[#c07724]"
@@ -93,11 +98,22 @@ export default function PortalNav({ role, name }: { role: PortalRole; name: stri
             );
           })}
         </nav>
-        <LogoutButton className="mt-4 text-sm text-slate-500 hover:text-slate-700 text-left px-3 py-2" />
+        <button
+          onClick={start}
+          data-tour-id="tour-help-button"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-500 hover:text-slate-700 text-left"
+        >
+          <HelpCircle className="w-4.5 h-4.5" />
+          Take a tour
+        </button>
+        <LogoutButton className="mt-1 text-sm text-slate-500 hover:text-slate-700 text-left px-3 py-2" />
       </aside>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 flex justify-around pb-[env(safe-area-inset-bottom)]">
+      <nav
+        data-tour-chrome="bottom"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 flex justify-around pb-[env(safe-area-inset-bottom)]"
+      >
         {items.map((item) => {
           const active =
             pathname === item.href ||
@@ -106,6 +122,7 @@ export default function PortalNav({ role, name }: { role: PortalRole; name: stri
             <Link
               key={item.href}
               href={item.href}
+              data-tour-id={item.tourId}
               className={`flex flex-col items-center gap-0.5 py-2.5 px-3 flex-1 text-xs font-medium ${
                 active ? "text-[#c07724]" : "text-slate-500"
               }`}

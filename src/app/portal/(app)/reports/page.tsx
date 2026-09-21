@@ -40,6 +40,7 @@ export default async function ReportsListPage() {
         {isAuthor && (
           <Link
             href="/portal/reports/new"
+            data-tour-id="new-report-button"
             className="bg-[#d6852b] text-white text-sm font-medium rounded-lg px-4 py-2 hover:bg-[#c07724] transition-colors"
           >
             + New report

@@ -20,7 +20,7 @@ export default async function NewReportPage() {
       <ZooReportForm
         mode="create"
         initialSubunits={subunits}
-        initial={{ date: today, unit: "Zoo", subUnitEntries: [] }}
+        initial={{ date: today, unit: "", subUnitEntries: [] }}
       />
     );
   }

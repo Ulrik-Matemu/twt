@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { clientAuth } from "@/lib/firebase-client";
 
-export default function PortalLoginPage() {
+function isSafeNextPath(next: string | null): next is string {
+  return !!next && (next.startsWith("/portal") || next.startsWith("/api/portal"));
+}
+
+function PortalLoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +41,14 @@ export default function PortalLoginPage() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Login failed");
+      }
+
+      // A `next` target (e.g. a PDF link from an email) may point at a raw
+      // API route rather than a page, so a hard navigation is used instead
+      // of the client router to land there reliably.
+      if (isSafeNextPath(next)) {
+        window.location.assign(next);
+        return;
       }
 
       router.push("/portal");
@@ -121,5 +135,13 @@ export default function PortalLoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function PortalLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <PortalLoginForm />
+    </Suspense>
   );
 }

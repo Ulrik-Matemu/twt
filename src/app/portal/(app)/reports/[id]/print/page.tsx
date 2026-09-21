@@ -1,10 +1,36 @@
 import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
 import { REVIEWER_ROLES, type ReportEntryInput, type ReportStatus } from "@/lib/portal-types";
+import { buildReportFilename } from "@/lib/report-filename";
 import ReportLetterhead from "../../ReportLetterhead";
 import PrintButton from "./PrintButton";
 import ZooCensusPrintBody from "./ZooCensusPrintBody";
+
+type PrintReportData = {
+  reportType?: "capture" | "zoo_census";
+  date: string;
+  project?: string;
+  site?: string;
+  unit?: string;
+  observerId: string;
+  observerName: string;
+  status: ReportStatus;
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const reportDoc = await adminDb.collection("reports").doc(id).get();
+  if (!reportDoc.exists) return {};
+
+  const report = reportDoc.data() as PrintReportData;
+  return { title: buildReportFilename(report) };
+}
 
 export default async function PrintReportPage({
   params,
@@ -18,16 +44,7 @@ export default async function PrintReportPage({
   const reportDoc = await adminDb.collection("reports").doc(id).get();
   if (!reportDoc.exists) notFound();
 
-  const report = reportDoc.data() as {
-    reportType?: "capture" | "zoo_census";
-    date: string;
-    project?: string;
-    site?: string;
-    unit?: string;
-    observerId: string;
-    observerName: string;
-    status: ReportStatus;
-  };
+  const report = reportDoc.data() as PrintReportData;
 
   // Printing is a reviewer-only action (admin, office_manager, admin_doctor) —
   // report authors never print, whether the report is a draft or submitted.

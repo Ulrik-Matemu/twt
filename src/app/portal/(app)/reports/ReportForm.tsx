@@ -223,6 +223,7 @@ export default function ReportForm({
       }
 
       const data = await res.json();
+
       router.push(`/portal/reports/${reportId || data.reportId}`);
       router.refresh();
     } catch (err) {

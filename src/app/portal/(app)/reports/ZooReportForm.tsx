@@ -47,22 +47,36 @@ export interface ZooReportFormInitial {
   subUnitEntries: SubUnitEntryDraft[];
 }
 
+const BASE_REQUIRED_FIELDS: { key: keyof SubUnitEntryDraft; label: string }[] = [
+  { key: "appearance", label: "Appearance and posture" },
+  { key: "behavior", label: "Behavior and activity level" },
+  { key: "respiration", label: "Respiration and breathing" },
+  { key: "faecesUrine", label: "Faeces and urine" },
+  { key: "woundsLesions", label: "Wounds and lesions" },
+  { key: "feedWaterIntake", label: "Feed and water intake" },
+  { key: "trainingAdaptability", label: "Training and adaptability" },
+];
+
+function getMissingFields(entry: SubUnitEntryDraft): string[] {
+  const missing: string[] = [];
+
+  for (const { key, label } of BASE_REQUIRED_FIELDS) {
+    const value = entry[key];
+    if (typeof value === "string" && !value.trim()) missing.push(label);
+  }
+
+  if (entry.hasIndividualParams && !entry.individualAnimalName.trim()) {
+    missing.push("Animal (for today's health parameters)");
+  }
+  if (entry.hasTreatment && !entry.treatmentNotes.trim()) {
+    missing.push("Treatment notes");
+  }
+
+  return missing;
+}
+
 function isSubUnitEntryComplete(entry: SubUnitEntryDraft): boolean {
-  const baseComplete =
-    entry.appearance.trim() &&
-    entry.behavior.trim() &&
-    entry.respiration.trim() &&
-    entry.faecesUrine.trim() &&
-    entry.woundsLesions.trim() &&
-    entry.feedWaterIntake.trim() &&
-    entry.trainingAdaptability.trim();
-
-  if (!baseComplete) return false;
-
-  if (entry.hasIndividualParams && !entry.individualAnimalName.trim()) return false;
-  if (entry.hasTreatment && !entry.treatmentNotes.trim()) return false;
-
-  return true;
+  return getMissingFields(entry).length === 0;
 }
 
 export default function ZooReportForm({
@@ -86,6 +100,7 @@ export default function ZooReportForm({
   const [pickerValue, setPickerValue] = useState("");
   const [submitting, setSubmitting] = useState<"draft" | "submit" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [triedSubmit, setTriedSubmit] = useState(false);
 
   const availableSubunits = subunits.filter(
     (s) => !entries.some((e) => e.subUnitId === s.id)
@@ -168,6 +183,13 @@ export default function ZooReportForm({
     }));
   }
 
+  function attemptSave(asDraft: boolean) {
+    setTriedSubmit(true);
+    const canProceed = asDraft ? canDraftSave : canSubmit;
+    if (!canProceed) return;
+    handleSave(asDraft);
+  }
+
   async function handleSave(asDraft: boolean) {
     setError(null);
     setSubmitting(asDraft ? "draft" : "submit");
@@ -198,6 +220,7 @@ export default function ZooReportForm({
       }
 
       const data = await res.json();
+
       router.push(`/portal/reports/${reportId || data.reportId}`);
       router.refresh();
     } catch (err) {
@@ -215,15 +238,35 @@ export default function ZooReportForm({
         {mode === "admin-edit" && "Edit census report"}
       </h1>
 
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+      <div
+        data-tour-id="zoo-general-details"
+        className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3"
+      >
         <h2 className="font-medium text-slate-900 text-sm">General details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <LabeledInput label="Date" type="date" value={date} onChange={setDate} />
-          <LabeledInput label="Unit" value={unit} onChange={setUnit} />
+          <LabeledInput
+            label="Date"
+            type="date"
+            value={date}
+            onChange={setDate}
+            required
+            error={triedSubmit && !date.trim() ? "Date is required" : undefined}
+          />
+          <LabeledInput
+            label="Unit"
+            value={unit}
+            onChange={setUnit}
+            placeholder="e.g. Zoo, Field Unit A..."
+            required
+            error={triedSubmit && !unit.trim() ? "Unit is required" : undefined}
+          />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+      <div
+        data-tour-id="zoo-add-subunit"
+        className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3"
+      >
         <h2 className="font-medium text-slate-900 text-sm">Add sub-unit</h2>
         <div className="flex gap-2">
           <select
@@ -261,6 +304,7 @@ export default function ZooReportForm({
           entry={entry}
           onChange={(patch) => updateEntry(entry.localId, patch)}
           onRemove={() => removeEntry(entry.localId)}
+          showMissing={triedSubmit}
         />
       ))}
 
@@ -270,20 +314,33 @@ export default function ZooReportForm({
         </p>
       )}
 
+      {triedSubmit && !canSubmit && (
+        <ValidationSummary
+          generalDetailsFilled={!!generalDetailsFilled}
+          date={date}
+          unit={unit}
+          entries={entries}
+        />
+      )}
+
       <div className="flex gap-3">
         {canSaveDraft && (
           <button
-            onClick={() => handleSave(true)}
-            disabled={!canDraftSave}
-            className="flex-1 bg-white border border-slate-300 text-slate-700 font-medium rounded-xl py-3 hover:bg-slate-50 transition-colors disabled:opacity-40"
+            onClick={() => attemptSave(true)}
+            disabled={submitting !== null}
+            className={`flex-1 bg-white border border-slate-300 text-slate-700 font-medium rounded-xl py-3 hover:bg-slate-50 transition-colors ${
+              canDraftSave ? "" : "opacity-40"
+            }`}
           >
             {submitting === "draft" ? "Saving..." : "Save as draft"}
           </button>
         )}
         <button
-          onClick={() => handleSave(false)}
-          disabled={!canSubmit}
-          className="flex-1 bg-[#d6852b] text-white font-medium rounded-xl py-3 hover:bg-[#c07724] transition-colors disabled:opacity-40"
+          onClick={() => attemptSave(false)}
+          disabled={submitting !== null}
+          className={`flex-1 bg-[#d6852b] text-white font-medium rounded-xl py-3 hover:bg-[#c07724] transition-colors ${
+            canSubmit ? "" : "opacity-40"
+          }`}
         >
           {submitting === "submit"
             ? "Saving..."
@@ -292,12 +349,51 @@ export default function ZooReportForm({
               : "Submit report"}
         </button>
       </div>
-      {entries.length > 0 && !allComplete && (
-        <p className="text-xs text-slate-500 text-center">
-          Complete all seven observations for each sub-unit (and details for
-          any optional section you turn on) before submitting.
-        </p>
-      )}
+    </div>
+  );
+}
+
+function ValidationSummary({
+  generalDetailsFilled,
+  date,
+  unit,
+  entries,
+}: {
+  generalDetailsFilled: boolean;
+  date: string;
+  unit: string;
+  entries: SubUnitEntryDraft[];
+}) {
+  const issues: string[] = [];
+
+  if (!generalDetailsFilled) {
+    if (!date.trim()) issues.push("Fill in the Date field");
+    if (!unit.trim()) issues.push("Fill in the Unit field");
+  }
+
+  if (entries.length === 0) {
+    issues.push("Add at least one sub-unit");
+  } else {
+    entries.forEach((entry, index) => {
+      const missing = getMissingFields(entry);
+      if (missing.length > 0) {
+        issues.push(`Sub-unit ${index + 1} (${entry.subUnitName}): ${missing.join(", ")}`);
+      }
+    });
+  }
+
+  if (issues.length === 0) return null;
+
+  return (
+    <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 space-y-1">
+      <p className="text-xs font-medium text-amber-800">
+        Before you can submit, please fix:
+      </p>
+      <ul className="text-xs text-amber-700 list-disc pl-4 space-y-0.5">
+        {issues.map((issue, i) => (
+          <li key={i}>{issue}</li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -307,21 +403,34 @@ function LabeledInput({
   value,
   onChange,
   type = "text",
+  placeholder,
+  required,
+  error,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
+  placeholder?: string;
+  required?: boolean;
+  error?: string;
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-slate-500 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-slate-500 mb-1">
+        {label}
+        {required && <span className="text-red-500"> *</span>}
+      </label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d6852b] focus:border-transparent"
+        placeholder={placeholder}
+        className={`w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d6852b] focus:border-transparent ${
+          error ? "border-red-300" : "border-slate-300"
+        }`}
       />
+      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
     </div>
   );
 }
@@ -353,16 +462,23 @@ function SubUnitCard({
   entry,
   onChange,
   onRemove,
+  showMissing,
 }: {
   index: number;
   entry: SubUnitEntryDraft;
   onChange: (patch: Partial<SubUnitEntryDraft>) => void;
   onRemove: () => void;
+  showMissing: boolean;
 }) {
-  const complete = isSubUnitEntryComplete(entry);
+  const missing = getMissingFields(entry);
+  const complete = missing.length === 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+    <div
+      className={`bg-white rounded-2xl border p-4 space-y-3 ${
+        showMissing && !complete ? "border-amber-300" : "border-slate-200"
+      }`}
+    >
       <div className="flex items-center justify-between">
         <h3 className="font-medium text-slate-900">
           {index + 1}. {entry.subUnitName}
@@ -380,6 +496,12 @@ function SubUnitCard({
           </button>
         </div>
       </div>
+
+      {showMissing && !complete && (
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5">
+          Missing: {missing.join(", ")}
+        </p>
+      )}
 
       {entry.animals.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
