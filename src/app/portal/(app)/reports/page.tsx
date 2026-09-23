@@ -30,6 +30,7 @@ export default async function ReportsListPage() {
       observerId: string;
       observerName: string;
       status: string;
+      notificationEmail?: { status: "sent" | "failed" };
     }),
   }));
 
@@ -74,6 +75,14 @@ export default async function ReportsListPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 ml-3">
+                  {canViewAll && r.notificationEmail?.status === "failed" && (
+                    <span
+                      title="Office wasn't notified by email for this report — check Resend or notify manually"
+                      className="text-xs font-medium px-2 py-1 rounded-full bg-red-50 text-red-700"
+                    >
+                      Email not sent
+                    </span>
+                  )}
                   <TypeBadge isZooCensus={isZooCensus} />
                   <StatusBadge status={r.status} />
                 </div>

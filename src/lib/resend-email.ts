@@ -12,22 +12,31 @@ export interface ReportSubmissionEmailParams {
   portalOrigin: string;
 }
 
+export type ReportSubmissionEmailResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
 // Notifies office@twt.co.tz with the report's PDF attached directly — no
 // login-gated link, so it's readable on any device, not just one with an
 // active portal session. Best-effort: the report is already saved by the
-// time this runs, so a failure here must never fail the report save.
-export async function sendReportSubmissionEmail(params: ReportSubmissionEmailParams) {
+// time this runs, so a failure here must never throw — callers persist the
+// returned result on the report so a silent failure stays visible instead
+// of only showing up in logs nobody checks.
+export async function sendReportSubmissionEmail(
+  params: ReportSubmissionEmailParams
+): Promise<ReportSubmissionEmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.error("RESEND_API_KEY is not configured; skipping notification email.");
-    return;
+    const error = "RESEND_API_KEY is not configured; skipping notification email.";
+    console.error(error);
+    return { ok: false, error };
   }
 
   try {
     const resend = new Resend(apiKey);
     const reportLink = `${params.portalOrigin}/portal/reports/${params.reportId}`;
 
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: NOTIFY_ADDRESS,
       to: NOTIFY_ADDRESS,
       subject: `New ${params.reportType} submitted — ${params.location} (${params.date})`,
@@ -48,7 +57,15 @@ export async function sendReportSubmissionEmail(params: ReportSubmissionEmailPar
         },
       ],
     });
+
+    if (error) {
+      console.error("Failed to send report submission email:", error);
+      return { ok: false, error: error.message ?? String(error) };
+    }
+
+    return { ok: true };
   } catch (error) {
     console.error("Failed to send report submission email:", error);
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
