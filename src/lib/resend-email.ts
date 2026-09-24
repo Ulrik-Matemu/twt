@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const NOTIFY_ADDRESS = "office@twt.co.tz";
 
 export interface ReportSubmissionEmailParams {
-  reportType: "Capture Report" | "Zoo Census Report";
+  reportType: "Capture Report" | "Zoo Census Report" | "Postmortem Report";
   observerName: string;
   date: string;
   location: string;

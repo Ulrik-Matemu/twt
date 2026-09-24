@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
-import { REVIEWER_ROLES, type AgeGroup, type ReportStatus } from "@/lib/portal-types";
+import { REVIEWER_ROLES, type AgeGroup, type AnimalSex, type ReportStatus } from "@/lib/portal-types";
 import { getAnimals } from "@/lib/animals-data";
 import { getZooSubunits } from "@/lib/zoo-roster-data";
 import ReportForm, { type EntryDraft } from "../../ReportForm";
 import ZooReportForm, { type SubUnitEntryDraft } from "../../ZooReportForm";
+import PostmortemReportForm from "../../PostmortemReportForm";
 
 export default async function EditReportPage({
   params,
@@ -26,6 +27,47 @@ export default async function EditReportPage({
   const canEdit = isReviewer || (isAuthor && reportData.status === "draft");
 
   if (!canEdit) redirect(`/portal/reports/${id}`);
+
+  if (reportData.reportType === "postmortem") {
+    const report = reportData as {
+      date: string;
+      location: string;
+      animalCommonName: string;
+      animalScientificName: string | null;
+      sex: AnimalSex | null;
+      age: string;
+      caseHistory: string;
+      postmortemFindings: string;
+      causeOfDeath: string;
+      recommendations: string;
+      imageUrls: string[] | null;
+      preparedByName: string;
+      preparedByTitle: string | null;
+    };
+
+    return (
+      <PostmortemReportForm
+        mode={isReviewer ? "admin-edit" : "draft-edit"}
+        reportId={id}
+        initial={{
+          date: report.date,
+          location: report.location || "",
+          animalCommonName: report.animalCommonName,
+          animalScientificName: report.animalScientificName || "",
+          sex: report.sex || "unknown",
+          age: report.age || "",
+          caseHistory: report.caseHistory || "",
+          postmortemFindings: report.postmortemFindings || "",
+          causeOfDeath: report.causeOfDeath || "",
+          recommendations: report.recommendations || "",
+          imageUrls: report.imageUrls || [],
+        }}
+        // "Prepared by" is fixed at creation time — editing (even by a
+        // reviewer) never reassigns who examined the animal.
+        preparedBy={{ name: report.preparedByName || user.name, title: report.preparedByTitle || "" }}
+      />
+    );
+  }
 
   if (reportData.reportType === "zoo_census") {
     const report = reportData as { date: string; unit: string; status: ReportStatus };

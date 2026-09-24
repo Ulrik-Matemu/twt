@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import PDFDocument from "pdfkit";
-import type { ReportEntryInput, SubUnitEntryInput } from "@/lib/portal-types";
+import type { PostmortemReportInput, ReportEntryInput, SubUnitEntryInput } from "@/lib/portal-types";
 
 const LOGO_PATH = path.join(process.cwd(), "public", "twt-logo-removebg-preview.png");
 const MARGIN = 50;
@@ -155,6 +155,44 @@ export async function generateCaptureReportPdf(
       drawLabeledLine(doc, "Delivered", "No");
     }
   });
+
+  return finalize(doc);
+}
+
+export async function generatePostmortemReportPdf(
+  report: Omit<PostmortemReportInput, "status"> & { observerName: string; status: string }
+): Promise<Buffer> {
+  const doc = newDocument();
+
+  drawLetterhead(doc, "Postmortem Report", report);
+  drawLabeledLine(doc, "Location", report.location);
+  drawLabeledLine(
+    doc,
+    "Animal species",
+    report.animalScientificName
+      ? `${report.animalCommonName} (${report.animalScientificName})`
+      : report.animalCommonName
+  );
+  drawLabeledLine(doc, "Sex", capitalize(report.sex));
+  drawLabeledLine(doc, "Age", report.age);
+  drawLabeledLine(
+    doc,
+    "Prepared by",
+    report.preparedByTitle ? `${report.preparedByName} — ${report.preparedByTitle}` : report.preparedByName
+  );
+  doc.moveDown(0.5);
+
+  drawSectionHeading(doc, "Case History");
+  doc.font("Times-Roman").fontSize(10).text(report.caseHistory || "—");
+
+  drawSectionHeading(doc, "Postmortem Findings");
+  doc.font("Times-Roman").fontSize(10).text(report.postmortemFindings || "—");
+
+  drawSectionHeading(doc, "Cause of Death");
+  doc.font("Times-Roman").fontSize(10).text(report.causeOfDeath || "—");
+
+  drawSectionHeading(doc, "Recommendations");
+  doc.font("Times-Roman").fontSize(10).text(report.recommendations || "—");
 
   return finalize(doc);
 }

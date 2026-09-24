@@ -3,11 +3,16 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import {
   REVIEWER_ROLES,
+  type AnimalSex,
   type ReportEntryInput,
   type ReportStatus,
   type SubUnitEntryInput,
 } from "@/lib/portal-types";
-import { generateCaptureReportPdf, generateZooCensusReportPdf } from "@/lib/pdf/report-pdf";
+import {
+  generateCaptureReportPdf,
+  generatePostmortemReportPdf,
+  generateZooCensusReportPdf,
+} from "@/lib/pdf/report-pdf";
 import { buildReportFilename } from "@/lib/report-filename";
 
 export async function GET(
@@ -30,11 +35,23 @@ export async function GET(
   }
 
   const report = reportDoc.data() as {
-    reportType?: "capture" | "zoo_census";
+    reportType?: "capture" | "zoo_census" | "postmortem";
     date: string;
     project?: string;
     site?: string;
     unit?: string;
+    location?: string;
+    animalCommonName?: string;
+    animalScientificName?: string;
+    sex?: AnimalSex;
+    age?: string;
+    caseHistory?: string;
+    postmortemFindings?: string;
+    causeOfDeath?: string;
+    recommendations?: string;
+    imageUrls?: string[];
+    preparedByName?: string;
+    preparedByTitle?: string;
     observerName: string;
     status: ReportStatus;
   };
@@ -47,7 +64,25 @@ export async function GET(
 
   let pdfBuffer: Buffer;
 
-  if (report.reportType === "zoo_census") {
+  if (report.reportType === "postmortem") {
+    pdfBuffer = await generatePostmortemReportPdf({
+      date: report.date,
+      location: report.location || "",
+      animalCommonName: report.animalCommonName || "",
+      animalScientificName: report.animalScientificName,
+      sex: report.sex || "unknown",
+      age: report.age || "",
+      caseHistory: report.caseHistory || "",
+      postmortemFindings: report.postmortemFindings || "",
+      causeOfDeath: report.causeOfDeath || "",
+      recommendations: report.recommendations || "",
+      imageUrls: report.imageUrls || [],
+      preparedByName: report.preparedByName || report.observerName,
+      preparedByTitle: report.preparedByTitle,
+      observerName: report.observerName,
+      status: report.status,
+    });
+  } else if (report.reportType === "zoo_census") {
     const entriesSnapshot = await reportDoc.ref
       .collection("subUnitEntries")
       .orderBy("createdAt")

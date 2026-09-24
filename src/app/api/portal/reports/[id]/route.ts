@@ -20,8 +20,18 @@ import {
   validateSubUnitEntries,
   validateZooGeneralDetails,
 } from "@/lib/zoo-report-helpers";
+import {
+  validatePostmortemDraft,
+  validatePostmortemGeneralDetails,
+  validatePostmortemReport,
+  type PostmortemReportClientInput,
+} from "@/lib/postmortem-report-helpers";
 import { logActivity } from "@/lib/activity-log";
-import { generateCaptureReportPdf, generateZooCensusReportPdf } from "@/lib/pdf/report-pdf";
+import {
+  generateCaptureReportPdf,
+  generatePostmortemReportPdf,
+  generateZooCensusReportPdf,
+} from "@/lib/pdf/report-pdf";
 import { sendReportSubmissionEmail } from "@/lib/resend-email";
 
 export async function GET(
@@ -85,9 +95,13 @@ export async function PATCH(
     const isReviewer = hasRole(user, REVIEWER_ROLES);
     const isAuthor = report.observerId === user.uid;
     const isZooCensus = report.reportType === "zoo_census";
+    const isPostmortem = report.reportType === "postmortem";
 
-    // Branch 1: review action (approve/flag), reviewer-only.
-    if (body.entries === undefined && body.subUnitEntries === undefined) {
+    // Branch 1: review action (approve/flag), reviewer-only. Distinguished
+    // from a full content edit by the absence of `date` — every full-edit
+    // payload (capture, zoo census, postmortem) always includes it, while
+    // ReviewPanel's review action never does.
+    if (body.date === undefined) {
       if (!isReviewer) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
@@ -105,7 +119,9 @@ export async function PATCH(
 
       const reportLabel = isZooCensus
         ? `zoo census report for ${report.unit}`
-        : `report for ${report.project} · ${report.site}`;
+        : isPostmortem
+          ? `postmortem report for ${report.animalCommonName}`
+          : `report for ${report.project} · ${report.site}`;
 
       await logActivity(user, "report.review", {
         targetType: "report",
@@ -127,6 +143,87 @@ export async function PATCH(
       body.status === "submitted" || body.status === "draft"
         ? body.status
         : (report.status as ReportStatus);
+
+    if (isPostmortem) {
+      const postmortem = body as PostmortemReportClientInput;
+
+      if (!validatePostmortemGeneralDetails(postmortem)) {
+        return NextResponse.json(
+          { error: "Missing report details (date, location, animal species)" },
+          { status: 400 }
+        );
+      }
+
+      if (nextStatus === "draft") {
+        if (!validatePostmortemDraft(postmortem)) {
+          return NextResponse.json(
+            { error: "A postmortem draft must at least identify the animal and exam date" },
+            { status: 400 }
+          );
+        }
+      } else if (!validatePostmortemReport(postmortem)) {
+        return NextResponse.json(
+          { error: "The postmortem report must have all required fields filled in" },
+          { status: 400 }
+        );
+      }
+
+      // "Prepared by" is fixed at creation time — editing (even by a
+      // reviewer) never reassigns who examined the animal, so it's
+      // deliberately left out of this update.
+      await reportRef.update({
+        date: postmortem.date,
+        location: postmortem.location ?? "",
+        animalCommonName: postmortem.animalCommonName,
+        animalScientificName: postmortem.animalScientificName ?? "",
+        sex: postmortem.sex ?? "unknown",
+        age: postmortem.age ?? "",
+        caseHistory: postmortem.caseHistory ?? "",
+        postmortemFindings: postmortem.postmortemFindings ?? "",
+        causeOfDeath: postmortem.causeOfDeath ?? "",
+        recommendations: postmortem.recommendations ?? "",
+        imageUrls: Array.isArray(postmortem.imageUrls) ? postmortem.imageUrls : [],
+        status: nextStatus,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+
+      const action = isReviewer
+        ? "report.edit"
+        : nextStatus === "submitted"
+          ? "report.submit"
+          : "report.save_draft";
+
+      await logActivity(user, action, {
+        targetType: "report",
+        targetId: id,
+        summary: `${isReviewer ? "Edited" : nextStatus === "submitted" ? "Submitted" : "Saved draft for"} postmortem report for ${postmortem.animalCommonName} (${postmortem.date})`,
+      });
+
+      if (nextStatus === "submitted" && !isReviewer) {
+        try {
+          const pdfBuffer = await generatePostmortemReportPdf({
+            ...postmortem,
+            preparedByName: report.preparedByName || user.name,
+            preparedByTitle: report.preparedByTitle || "",
+            observerName: user.name,
+            status: "submitted",
+          });
+          await sendReportSubmissionEmail({
+            reportType: "Postmortem Report",
+            observerName: user.name,
+            date: postmortem.date,
+            location: postmortem.animalCommonName,
+            reportId: id,
+            pdfBuffer,
+            portalOrigin: new URL(req.url).origin,
+          });
+        } catch (emailError) {
+          console.error("Report submission email failed:", emailError);
+        }
+      }
+
+      return NextResponse.json({ success: true });
+    }
 
     if (isZooCensus) {
       const { date, unit, subUnitEntries } = body;

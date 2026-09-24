@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
-import { REPORT_AUTHOR_ROLES, REVIEWER_ROLES } from "@/lib/portal-types";
+import { POSTMORTEM_AUTHOR_ROLES, REPORT_AUTHOR_ROLES, REVIEWER_ROLES, type ReportType } from "@/lib/portal-types";
 
 export default async function ReportsListPage() {
   const user = await getSessionUser();
   if (!user) return null;
 
   const canViewAll = hasRole(user, REVIEWER_ROLES);
-  const isAuthor = hasRole(user, REPORT_AUTHOR_ROLES);
+  const isAuthor = hasRole(user, REPORT_AUTHOR_ROLES) || hasRole(user, POSTMORTEM_AUTHOR_ROLES);
 
   const query = canViewAll
     ? adminDb.collection("reports").orderBy("createdAt", "desc").limit(200)
@@ -22,11 +22,12 @@ export default async function ReportsListPage() {
   const reports = snapshot.docs.map((doc) => ({
     id: doc.id,
     ...(doc.data() as {
-      reportType?: "capture" | "zoo_census";
+      reportType?: ReportType;
       date: string;
       project?: string;
       site?: string;
       unit?: string;
+      animalCommonName?: string;
       observerId: string;
       observerName: string;
       status: string;
@@ -62,14 +63,18 @@ export default async function ReportsListPage() {
             // editable" history entry rather than a link to full details.
             const canOpen = canViewAll || isOwnDraft;
 
-            const isZooCensus = r.reportType === "zoo_census";
+            const reportType: ReportType = r.reportType || "capture";
+            const location =
+              reportType === "zoo_census"
+                ? r.unit
+                : reportType === "postmortem"
+                  ? r.animalCommonName
+                  : `${r.project} · ${r.site}`;
 
             const rowContent = (
               <>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-900 truncate">
-                    {isZooCensus ? r.unit : `${r.project} · ${r.site}`}
-                  </p>
+                  <p className="text-sm font-medium text-slate-900 truncate">{location}</p>
                   <p className="text-xs text-slate-500">
                     {r.date} &middot; {r.observerName}
                   </p>
@@ -83,7 +88,7 @@ export default async function ReportsListPage() {
                       Email not sent
                     </span>
                   )}
-                  <TypeBadge isZooCensus={isZooCensus} />
+                  <TypeBadge reportType={reportType} />
                   <StatusBadge status={r.status} />
                 </div>
               </>
@@ -135,10 +140,16 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function TypeBadge({ isZooCensus }: { isZooCensus: boolean }) {
+const TYPE_BADGE_LABELS: Record<ReportType, string> = {
+  capture: "Capture",
+  zoo_census: "Census",
+  postmortem: "Postmortem",
+};
+
+function TypeBadge({ reportType }: { reportType: ReportType }) {
   return (
     <span className="text-xs font-medium px-2 py-1 rounded-full bg-slate-100 text-slate-600">
-      {isZooCensus ? "Census" : "Capture"}
+      {TYPE_BADGE_LABELS[reportType]}
     </span>
   );
 }

@@ -5,6 +5,7 @@ import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
 import {
   REVIEWER_ROLES,
+  type AnimalSex,
   type ReportEntryInput,
   type ReportStatus,
   type SubUnitEntryInput,
@@ -32,17 +33,19 @@ export default async function ReportDetailPage({
   if (!reportDoc.exists) notFound();
 
   const report = reportDoc.data() as {
-    reportType?: "capture" | "zoo_census";
+    reportType?: "capture" | "zoo_census" | "postmortem";
     date: string;
     project?: string;
     site?: string;
     unit?: string;
+    animalCommonName?: string;
     observerId: string;
     observerName: string;
     status: ReportStatus;
     reviewNotes?: string;
   };
   const isZooCensus = report.reportType === "zoo_census";
+  const isPostmortem = report.reportType === "postmortem";
 
   const canViewAll = hasRole(user, REVIEWER_ROLES);
   const isAuthor = report.observerId === user.uid;
@@ -63,7 +66,11 @@ export default async function ReportDetailPage({
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-xl font-semibold text-slate-900">
-              {isZooCensus ? report.unit : `${report.project} · ${report.site}`}
+              {isZooCensus
+                ? report.unit
+                : isPostmortem
+                  ? report.animalCommonName
+                  : `${report.project} · ${report.site}`}
             </h1>
             <span
               className={`text-xs font-medium px-2 py-1 rounded-full capitalize ${STATUS_STYLES[report.status]}`}
@@ -71,7 +78,7 @@ export default async function ReportDetailPage({
               {report.status}
             </span>
             <span className="text-xs font-medium px-2 py-1 rounded-full bg-slate-100 text-slate-600">
-              {isZooCensus ? "Zoo Census" : "Capture"}
+              {isZooCensus ? "Zoo Census" : isPostmortem ? "Postmortem" : "Capture"}
             </span>
           </div>
           <p className="text-sm text-slate-500">
@@ -101,6 +108,8 @@ export default async function ReportDetailPage({
 
       {isZooCensus ? (
         <ZooCensusBody reportRef={reportDoc.ref} />
+      ) : isPostmortem ? (
+        <PostmortemBody reportDoc={reportDoc} />
       ) : (
         <CaptureBody reportRef={reportDoc.ref} />
       )}
@@ -186,6 +195,66 @@ async function CaptureBody({
       ))}
     </div>
   );
+}
+
+async function PostmortemBody({
+  reportDoc,
+}: {
+  reportDoc: FirebaseFirestore.DocumentSnapshot;
+}) {
+  const report = reportDoc.data() as {
+    location: string;
+    animalCommonName: string;
+    animalScientificName?: string;
+    sex: AnimalSex;
+    age: string;
+    caseHistory: string;
+    postmortemFindings: string;
+    causeOfDeath: string;
+    recommendations: string;
+    imageUrls?: string[];
+    preparedByName: string;
+    preparedByTitle?: string;
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-4">
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+        <Field label="Location" value={report.location} />
+        <Field
+          label="Animal species"
+          value={
+            report.animalScientificName
+              ? `${report.animalCommonName} (${report.animalScientificName})`
+              : report.animalCommonName
+          }
+        />
+        <Field label="Sex" value={capitalize(report.sex)} />
+        <Field label="Age" value={report.age} />
+        <Field
+          label="Prepared by"
+          value={
+            report.preparedByTitle
+              ? `${report.preparedByName} — ${report.preparedByTitle}`
+              : report.preparedByName
+          }
+        />
+      </dl>
+
+      <Field label="Case history" value={report.caseHistory} block />
+      <Field label="Postmortem findings" value={report.postmortemFindings} block />
+      <Field label="Cause of death" value={report.causeOfDeath} block />
+      <Field label="Recommendations" value={report.recommendations} block />
+
+      {report.imageUrls && report.imageUrls.length > 0 && (
+        <ImageGrid label="Photos" urls={report.imageUrls} />
+      )}
+    </div>
+  );
+}
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 async function ZooCensusBody({

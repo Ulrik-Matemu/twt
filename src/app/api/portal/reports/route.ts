@@ -3,6 +3,8 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSessionUser, hasRole, requireRole } from "@/lib/portal-auth";
 import {
+  PORTAL_ROLE_LABELS,
+  POSTMORTEM_AUTHOR_ROLES,
   REPORT_AUTHOR_ROLES,
   REVIEWER_ROLES,
   type ReportEntryInput,
@@ -22,8 +24,18 @@ import {
   validateSubUnitEntries,
   validateZooGeneralDetails,
 } from "@/lib/zoo-report-helpers";
+import {
+  validatePostmortemDraft,
+  validatePostmortemGeneralDetails,
+  validatePostmortemReport,
+  type PostmortemReportClientInput,
+} from "@/lib/postmortem-report-helpers";
 import { logActivity } from "@/lib/activity-log";
-import { generateCaptureReportPdf, generateZooCensusReportPdf } from "@/lib/pdf/report-pdf";
+import {
+  generateCaptureReportPdf,
+  generatePostmortemReportPdf,
+  generateZooCensusReportPdf,
+} from "@/lib/pdf/report-pdf";
 import { sendReportSubmissionEmail } from "@/lib/resend-email";
 import type { DocumentReference } from "firebase-admin/firestore";
 
@@ -69,14 +81,107 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const user = await getSessionUser();
-  if (!requireRole(user, REPORT_AUTHOR_ROLES)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
 
   try {
     const body = await req.json();
     const isDraft = body.status === "draft";
     const isZooCensus = body.reportType === "zoo_census";
+    const isPostmortem = body.reportType === "postmortem";
+
+    const allowedRoles = isPostmortem ? POSTMORTEM_AUTHOR_ROLES : REPORT_AUTHOR_ROLES;
+    if (!requireRole(user, allowedRoles)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    if (isPostmortem) {
+      const postmortem = body as PostmortemReportClientInput;
+
+      if (!validatePostmortemGeneralDetails(postmortem)) {
+        return NextResponse.json(
+          { error: "Missing report details (date, location, animal species)" },
+          { status: 400 }
+        );
+      }
+
+      if (isDraft) {
+        if (!validatePostmortemDraft(postmortem)) {
+          return NextResponse.json(
+            { error: "A postmortem draft must at least identify the animal and exam date" },
+            { status: 400 }
+          );
+        }
+      } else if (!validatePostmortemReport(postmortem)) {
+        return NextResponse.json(
+          { error: "The postmortem report must have all required fields filled in" },
+          { status: 400 }
+        );
+      }
+
+      // "Prepared by" always reflects who is actually logged in — the
+      // submitting doctor's session name and role — never anything the
+      // client could send.
+      const preparedByName = user.name;
+      const preparedByTitle = PORTAL_ROLE_LABELS[user.role];
+
+      const reportRef = adminDb.collection("reports").doc();
+
+      await reportRef.set({
+        reportType: "postmortem",
+        date: postmortem.date,
+        location: postmortem.location ?? "",
+        animalCommonName: postmortem.animalCommonName,
+        animalScientificName: postmortem.animalScientificName ?? "",
+        sex: postmortem.sex ?? "unknown",
+        age: postmortem.age ?? "",
+        caseHistory: postmortem.caseHistory ?? "",
+        postmortemFindings: postmortem.postmortemFindings ?? "",
+        causeOfDeath: postmortem.causeOfDeath ?? "",
+        recommendations: postmortem.recommendations ?? "",
+        imageUrls: Array.isArray(postmortem.imageUrls) ? postmortem.imageUrls : [],
+        preparedByName,
+        preparedByTitle,
+        observerId: user.uid,
+        observerName: user.name,
+        status: isDraft ? "draft" : "submitted",
+        createdAt: FieldValue.serverTimestamp(),
+      });
+
+      await logActivity(user, isDraft ? "report.save_draft" : "report.submit", {
+        targetType: "report",
+        targetId: reportRef.id,
+        summary: `${isDraft ? "Saved draft" : "Submitted"} postmortem report for ${postmortem.animalCommonName} (${postmortem.date})`,
+      });
+
+      if (!isDraft) {
+        try {
+          const pdfBuffer = await generatePostmortemReportPdf({
+            ...postmortem,
+            preparedByName,
+            preparedByTitle,
+            observerName: user.name,
+            status: "submitted",
+          });
+          const result = await sendReportSubmissionEmail({
+            reportType: "Postmortem Report",
+            observerName: user.name,
+            date: postmortem.date,
+            location: postmortem.animalCommonName,
+            reportId: reportRef.id,
+            pdfBuffer,
+            portalOrigin: new URL(req.url).origin,
+          });
+          await recordNotificationStatus(reportRef, result);
+        } catch (emailError) {
+          console.error("Report submission email failed:", emailError);
+          await recordNotificationStatus(reportRef, {
+            ok: false,
+            error: emailError instanceof Error ? emailError.message : String(emailError),
+          });
+        }
+      }
+
+      return NextResponse.json({ success: true, reportId: reportRef.id });
+    }
 
     if (isZooCensus) {
       const { date, unit, subUnitEntries } = body as ZooCensusReportInput;

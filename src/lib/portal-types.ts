@@ -7,6 +7,9 @@ export type PortalRole =
 
 export const DOCTOR_ROLES: PortalRole[] = ["admin_doctor", "zoo_doctor", "field_doctor"];
 export const REPORT_AUTHOR_ROLES: PortalRole[] = ["zoo_doctor", "field_doctor"];
+// Postmortem reports can be authored by any doctor, unlike capture/zoo
+// census reports which are each tied to one specific doctor role.
+export const POSTMORTEM_AUTHOR_ROLES: PortalRole[] = DOCTOR_ROLES;
 export const REVIEWER_ROLES: PortalRole[] = ["admin", "office_manager", "admin_doctor"];
 export const CATALOG_MANAGER_ROLES: PortalRole[] = ["admin", "office_manager"];
 export const USER_MANAGER_ROLES: PortalRole[] = ["admin"];
@@ -65,7 +68,7 @@ export interface ReportInput {
 
 export type ReportStatus = "draft" | "submitted" | "reviewed" | "flagged";
 
-export type ReportType = "capture" | "zoo_census";
+export type ReportType = "capture" | "zoo_census" | "postmortem";
 
 export interface ZooSubUnitAnimal {
   name: string;
@@ -107,3 +110,35 @@ export interface ZooCensusReportInput {
   status?: "draft" | "submitted";
   subUnitEntries: SubUnitEntryInput[] | SubUnitEntryDraftInput[];
 }
+
+export type AnimalSex = "male" | "female" | "unknown";
+
+// Postmortem reports cover a single animal with free-text findings, so —
+// unlike capture/zoo census reports — there's no repeating entries array;
+// every field lives directly on the report document.
+export interface PostmortemReportInput {
+  date: string; // date of examination
+  location: string;
+  animalCommonName: string;
+  animalScientificName?: string;
+  sex: AnimalSex;
+  age: string; // free text, e.g. "3 months" — postmortem ages are rarely exact
+  caseHistory: string;
+  postmortemFindings: string;
+  causeOfDeath: string;
+  recommendations: string;
+  imageUrls: string[];
+  // Never client-editable — set from the submitting doctor's session
+  // (name + role label) at creation time, so the "prepared by" line always
+  // reflects who was actually logged in, not free text a form could fake.
+  preparedByName: string;
+  preparedByTitle?: string;
+  status?: "draft" | "submitted";
+}
+
+// Draft postmortem reports can be partially filled in — only the animal
+// identity and exam date are guaranteed present.
+export type PostmortemReportDraftInput = Partial<PostmortemReportInput> & {
+  animalCommonName: string;
+  date: string;
+};

@@ -2,18 +2,34 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
-import { REVIEWER_ROLES, type ReportEntryInput, type ReportStatus } from "@/lib/portal-types";
+import {
+  REVIEWER_ROLES,
+  type AnimalSex,
+  type ReportEntryInput,
+  type ReportStatus,
+} from "@/lib/portal-types";
 import { buildReportFilename } from "@/lib/report-filename";
 import ReportLetterhead from "../../ReportLetterhead";
 import PrintButton from "./PrintButton";
 import ZooCensusPrintBody from "./ZooCensusPrintBody";
 
 type PrintReportData = {
-  reportType?: "capture" | "zoo_census";
+  reportType?: "capture" | "zoo_census" | "postmortem";
   date: string;
   project?: string;
   site?: string;
   unit?: string;
+  location?: string;
+  animalCommonName?: string;
+  animalScientificName?: string;
+  sex?: AnimalSex;
+  age?: string;
+  caseHistory?: string;
+  postmortemFindings?: string;
+  causeOfDeath?: string;
+  recommendations?: string;
+  preparedByName?: string;
+  preparedByTitle?: string;
   observerId: string;
   observerName: string;
   status: ReportStatus;
@@ -51,6 +67,60 @@ export default async function PrintReportPage({
   const canPrint = hasRole(user, REVIEWER_ROLES);
   if (!canPrint) {
     redirect(`/portal/reports/${id}`);
+  }
+
+  if (report.reportType === "postmortem") {
+    return (
+      <div className="max-w-[900px] mx-auto p-6 print:p-0">
+        <PrintStyles orientation="portrait" />
+        <PreviewBar />
+        <ReportLetterhead title="Postmortem Report" status={report.status} />
+
+        <dl className="grid grid-cols-2 gap-4 text-sm mb-6">
+          <div>
+            <dt className="text-xs font-medium text-slate-500">Date of examination</dt>
+            <dd className="text-slate-900">{report.date}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-slate-500">Location</dt>
+            <dd className="text-slate-900">{report.location}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-slate-500">Animal species</dt>
+            <dd className="text-slate-900">
+              {report.animalScientificName
+                ? `${report.animalCommonName} (${report.animalScientificName})`
+                : report.animalCommonName}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-slate-500">Sex</dt>
+            <dd className="text-slate-900 capitalize">{report.sex}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-slate-500">Age</dt>
+            <dd className="text-slate-900">{report.age}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-slate-500">Prepared by</dt>
+            <dd className="text-slate-900">
+              {report.preparedByTitle
+                ? `${report.preparedByName} — ${report.preparedByTitle}`
+                : report.preparedByName}
+            </dd>
+          </div>
+        </dl>
+
+        <div className="space-y-4 text-sm">
+          <PrintSection label="Case history" value={report.caseHistory} />
+          <PrintSection label="Postmortem findings" value={report.postmortemFindings} />
+          <PrintSection label="Cause of death" value={report.causeOfDeath} />
+          <PrintSection label="Recommendations" value={report.recommendations} />
+        </div>
+
+        <Footer />
+      </div>
+    );
   }
 
   if (report.reportType === "zoo_census") {
@@ -182,6 +252,15 @@ export default async function PrintReportPage({
       </table>
 
       <Footer />
+    </div>
+  );
+}
+
+function PrintSection({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="break-inside-avoid">
+      <p className="text-xs font-medium text-slate-500 mb-1">{label}</p>
+      <p className="text-slate-900 whitespace-pre-wrap">{value}</p>
     </div>
   );
 }
