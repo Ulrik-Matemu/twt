@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 
 const NOTIFY_ADDRESS = "office@twt.co.tz";
+const RECIPIENTS = [NOTIFY_ADDRESS, "d.modest@gsmgroup.africa"];
 
 export interface ReportSubmissionEmailParams {
   reportType: "Capture Report" | "Zoo Census Report" | "Postmortem Report";
@@ -16,7 +17,7 @@ export type ReportSubmissionEmailResult =
   | { ok: true }
   | { ok: false; error: string };
 
-// Notifies office@twt.co.tz with the report's PDF attached directly — no
+// Notifies office@twt.co.tz and d.modest@gsmgroup.africa with the report's PDF attached directly — no
 // login-gated link, so it's readable on any device, not just one with an
 // active portal session. Best-effort: the report is already saved by the
 // time this runs, so a failure here must never throw — callers persist the
@@ -38,7 +39,7 @@ export async function sendReportSubmissionEmail(
 
     const { error } = await resend.emails.send({
       from: NOTIFY_ADDRESS,
-      to: NOTIFY_ADDRESS,
+      to: RECIPIENTS,
       subject: `New ${params.reportType} submitted — ${params.location} (${params.date})`,
       html: `
         <p>A new report was submitted on the TWT Animal Monitoring Portal.</p>
