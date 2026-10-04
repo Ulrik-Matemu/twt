@@ -5,6 +5,7 @@ import { PostHogProvider } from "./providers";
 import { Suspense } from "react";
 import NavigationProgress from "./components/NavigationProgress";
 import PageLoadingBadge from "./components/PageLoadingBadge";
+import UpdateNotifier from "./components/UpdateNotifier";
 import { NavigationLoadingProvider } from "./components/NavigationLoadingContext";
 
 export const metadata: Metadata = {
@@ -49,6 +50,7 @@ export default function RootLayout({
           <NavigationLoadingProvider>
             <NavigationProgress />
             <PageLoadingBadge />
+            <UpdateNotifier />
             <PostHogProvider>
               <SiteChrome>{children}</SiteChrome>
             </PostHogProvider>
