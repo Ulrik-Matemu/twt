@@ -7,6 +7,7 @@ import LogoutButton from "./components/LogoutButton";
 import { TourProvider } from "./components/tour/TourProvider";
 import TourOverlay from "./components/tour/TourOverlay";
 import MobileTourButton from "./components/tour/MobileTourButton";
+import UpdateButton from "./components/UpdateButton";
 
 export default async function PortalLayout({
   children,
@@ -47,6 +48,7 @@ export default async function PortalLayout({
               </div>
             </div>
             <div className="flex items-center gap-3 shrink-0">
+              <UpdateButton variant="header" />
               <MobileTourButton />
               <LogoutButton className="text-xs text-slate-500" />
             </div>

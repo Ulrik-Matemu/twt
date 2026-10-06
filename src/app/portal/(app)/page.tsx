@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
+import { getRecentEmailLog, summarizeEmailLog } from "@/lib/email-log-data";
 import {
+  EMAIL_MANAGER_ROLES,
   PORTAL_ROLE_LABELS,
   REPORT_AUTHOR_ROLES,
   REVIEWER_ROLES,
@@ -22,7 +24,12 @@ export default async function PortalDashboardPage() {
         .orderBy("createdAt", "desc")
         .limit(5);
 
-  const snapshot = await query.get();
+  const isEmailManager = hasRole(user, EMAIL_MANAGER_ROLES);
+  const [snapshot, emailLog] = await Promise.all([
+    query.get(),
+    isEmailManager ? getRecentEmailLog(200) : Promise.resolve([]),
+  ]);
+  const emailSummary = summarizeEmailLog(emailLog);
   const reports = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
   return (
@@ -42,6 +49,28 @@ export default async function PortalDashboardPage() {
           className="block bg-[#d6852b] text-white font-medium rounded-xl px-4 py-3 text-center hover:bg-[#c07724] transition-colors"
         >
           + New monitoring report
+        </Link>
+      )}
+
+      {isEmailManager && (
+        <Link
+          href="/portal/email"
+          className={`block rounded-2xl border p-4 transition-colors ${
+            emailSummary.problems > 0
+              ? "bg-red-50 border-red-200 hover:border-red-300"
+              : "bg-white border-slate-200 hover:border-slate-300"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="font-medium text-slate-900">Report emails · last 7 days</h2>
+            <span className="text-sm text-[#c07724]">Manage</span>
+          </div>
+          <p className="text-sm text-slate-600 mt-1">
+            {emailSummary.sent} sent &middot; {emailSummary.delivered} delivered &middot;{" "}
+            <span className={emailSummary.problems > 0 ? "font-medium text-red-700" : ""}>
+              {emailSummary.problems} failed or bounced
+            </span>
+          </p>
         </Link>
       )}
 

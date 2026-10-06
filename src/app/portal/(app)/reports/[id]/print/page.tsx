@@ -28,6 +28,7 @@ type PrintReportData = {
   postmortemFindings?: string;
   causeOfDeath?: string;
   recommendations?: string;
+  imageUrls?: string[];
   preparedByName?: string;
   preparedByTitle?: string;
   observerId: string;
@@ -117,6 +118,13 @@ export default async function PrintReportPage({
           <PrintSection label="Cause of death" value={report.causeOfDeath} />
           <PrintSection label="Recommendations" value={report.recommendations} />
         </div>
+
+        <PrintPhotos
+          photos={(report.imageUrls ?? []).map((url) => ({
+            url,
+            caption: `${report.animalCommonName} — postmortem photo`,
+          }))}
+        />
 
         <Footer />
       </div>
@@ -251,8 +259,43 @@ export default async function PrintReportPage({
         </tbody>
       </table>
 
+      <PrintPhotos
+        photos={entries.flatMap((entry, index) => [
+          ...(entry.imageUrls ?? []).map((url, i) => ({
+            url,
+            caption: `${index + 1}. ${entry.animalName} — photo ${i + 1}`,
+          })),
+          ...(entry.deliveryImageUrl
+            ? [{ url: entry.deliveryImageUrl, caption: `${index + 1}. ${entry.animalName} — delivery photo` }]
+            : []),
+        ])}
+      />
+
       <Footer />
     </div>
+  );
+}
+
+// Each photo gets its own printed page, matching the emailed PDF.
+function PrintPhotos({ photos }: { photos: { url: string; caption: string }[] }) {
+  if (photos.length === 0) return null;
+  return (
+    <>
+      {photos.map((photo, index) => (
+        <section key={photo.url} className="photo-page mt-8">
+          <h2 className="text-sm font-semibold text-slate-900">Photographic Record</h2>
+          <p className="text-xs text-slate-500 border-b border-slate-800 pb-2 mb-4">
+            {photo.caption} · Photo {index + 1} of {photos.length}
+          </p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={photo.url}
+            alt={photo.caption}
+            className="mx-auto max-h-[150mm] max-w-full object-contain border border-slate-200"
+          />
+        </section>
+      ))}
+    </>
   );
 }
 
@@ -273,6 +316,7 @@ function PrintStyles({ orientation }: { orientation: "portrait" | "landscape" })
         body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       }
       .entry-row, .subunit-section { break-inside: avoid; }
+      @media print { .photo-page { break-before: page; margin-top: 0; } }
     `}</style>
   );
 }

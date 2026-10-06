@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Upload, Loader2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { uploadImage } from "@/lib/cloudinary-client";
+import ImageUploadField from "./ImageUploadField";
 import type { AgeGroup } from "@/lib/portal-types";
 
 export interface AnimalOption {
@@ -551,67 +552,6 @@ function EntryCard({
             />
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-function ImageUploadField({
-  label,
-  required,
-  urls,
-  uploading,
-  multiple,
-  onFiles,
-  onRemove,
-}: {
-  label: string;
-  required?: boolean;
-  urls: string[];
-  uploading: boolean;
-  multiple: boolean;
-  onFiles: (files: FileList | null) => void;
-  onRemove: (url: string) => void;
-}) {
-  return (
-    <div>
-      <label className="block text-xs font-medium text-slate-500 mb-1.5">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <div className="flex gap-2 flex-wrap">
-        {urls.map((url) => (
-          <div key={url} className="relative w-20 h-20">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={url}
-              alt={label}
-              className="w-20 h-20 rounded-lg object-cover border border-slate-200"
-            />
-            <button
-              type="button"
-              onClick={() => onRemove(url)}
-              className="absolute -top-1.5 -right-1.5 bg-slate-900 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-            >
-              &times;
-            </button>
-          </div>
-        ))}
-
-        <label className="w-20 h-20 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-[#d6852b] transition-colors">
-          {uploading ? (
-            <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
-          ) : (
-            <Upload className="w-5 h-5 text-slate-400" />
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            multiple={multiple}
-            onChange={(e) => onFiles(e.target.files)}
-            className="hidden"
-          />
-        </label>
       </div>
     </div>
   );

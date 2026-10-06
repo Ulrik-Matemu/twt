@@ -11,9 +11,11 @@ import {
   History,
   Trees,
   HelpCircle,
+  Mail,
 } from "lucide-react";
 import type { PortalRole } from "@/lib/portal-types";
 import LogoutButton from "./LogoutButton";
+import UpdateButton from "./UpdateButton";
 import { useTour } from "./tour/TourProvider";
 
 interface NavItem {
@@ -43,6 +45,12 @@ const NAV_ITEMS: NavItem[] = [
     href: "/portal/users",
     label: "Users",
     icon: Users,
+    roles: ["admin"],
+  },
+  {
+    href: "/portal/email",
+    label: "Email",
+    icon: Mail,
     roles: ["admin"],
   },
   {
@@ -98,6 +106,7 @@ export default function PortalNav({ role, name }: { role: PortalRole; name: stri
             );
           })}
         </nav>
+        <UpdateButton variant="sidebar" />
         <button
           onClick={start}
           data-tour-id="tour-help-button"

@@ -1,19 +1,8 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
-import {
-  REVIEWER_ROLES,
-  type AnimalSex,
-  type ReportEntryInput,
-  type ReportStatus,
-  type SubUnitEntryInput,
-} from "@/lib/portal-types";
-import {
-  generateCaptureReportPdf,
-  generatePostmortemReportPdf,
-  generateZooCensusReportPdf,
-} from "@/lib/pdf/report-pdf";
-import { buildReportFilename } from "@/lib/report-filename";
+import { REVIEWER_ROLES } from "@/lib/portal-types";
+import { buildReportPdf } from "@/lib/pdf/build-report-pdf";
 
 export async function GET(
   req: Request,
@@ -34,89 +23,14 @@ export async function GET(
     return NextResponse.json({ error: "Report not found" }, { status: 404 });
   }
 
-  const report = reportDoc.data() as {
-    reportType?: "capture" | "zoo_census" | "postmortem";
-    date: string;
-    project?: string;
-    site?: string;
-    unit?: string;
-    location?: string;
-    animalCommonName?: string;
-    animalScientificName?: string;
-    sex?: AnimalSex;
-    age?: string;
-    caseHistory?: string;
-    postmortemFindings?: string;
-    causeOfDeath?: string;
-    recommendations?: string;
-    imageUrls?: string[];
-    preparedByName?: string;
-    preparedByTitle?: string;
-    observerName: string;
-    status: ReportStatus;
-  };
-
   // Same reviewer-only rule as the existing HTML print view.
-  const canView = hasRole(user, REVIEWER_ROLES);
-  if (!canView) {
+  if (!hasRole(user, REVIEWER_ROLES)) {
     return NextResponse.redirect(new URL(`/portal/reports/${id}`, url.origin));
   }
 
-  let pdfBuffer: Buffer;
+  const { buffer, filename } = await buildReportPdf(reportDoc);
 
-  if (report.reportType === "postmortem") {
-    pdfBuffer = await generatePostmortemReportPdf({
-      date: report.date,
-      location: report.location || "",
-      animalCommonName: report.animalCommonName || "",
-      animalScientificName: report.animalScientificName,
-      sex: report.sex || "unknown",
-      age: report.age || "",
-      caseHistory: report.caseHistory || "",
-      postmortemFindings: report.postmortemFindings || "",
-      causeOfDeath: report.causeOfDeath || "",
-      recommendations: report.recommendations || "",
-      imageUrls: report.imageUrls || [],
-      preparedByName: report.preparedByName || report.observerName,
-      preparedByTitle: report.preparedByTitle,
-      observerName: report.observerName,
-      status: report.status,
-    });
-  } else if (report.reportType === "zoo_census") {
-    const entriesSnapshot = await reportDoc.ref
-      .collection("subUnitEntries")
-      .orderBy("createdAt")
-      .get();
-    const entries = entriesSnapshot.docs.map((doc) => doc.data() as SubUnitEntryInput);
-
-    pdfBuffer = await generateZooCensusReportPdf(
-      {
-        date: report.date,
-        unit: report.unit || "",
-        observerName: report.observerName,
-        status: report.status,
-      },
-      entries
-    );
-  } else {
-    const entriesSnapshot = await reportDoc.ref.collection("entries").orderBy("createdAt").get();
-    const entries = entriesSnapshot.docs.map((doc) => doc.data() as ReportEntryInput);
-
-    pdfBuffer = await generateCaptureReportPdf(
-      {
-        date: report.date,
-        project: report.project || "",
-        site: report.site || "",
-        observerName: report.observerName,
-        status: report.status,
-      },
-      entries
-    );
-  }
-
-  const filename = buildReportFilename(report);
-
-  return new NextResponse(new Uint8Array(pdfBuffer), {
+  return new NextResponse(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="${filename}.pdf"`,

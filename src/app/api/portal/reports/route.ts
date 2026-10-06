@@ -36,26 +36,8 @@ import {
   generatePostmortemReportPdf,
   generateZooCensusReportPdf,
 } from "@/lib/pdf/report-pdf";
-import { sendReportSubmissionEmail } from "@/lib/resend-email";
-import type { DocumentReference } from "firebase-admin/firestore";
-
-// Persists whether the office notification email went out, so a failure
-// (e.g. a missing/invalid Resend API key) is visible on the report itself
-// instead of only in server logs nobody checks day-to-day.
-async function recordNotificationStatus(
-  reportRef: DocumentReference,
-  result: { ok: true } | { ok: false; error: string }
-) {
-  try {
-    await reportRef.update({
-      notificationEmail: result.ok
-        ? { status: "sent", sentAt: FieldValue.serverTimestamp() }
-        : { status: "failed", error: result.error, failedAt: FieldValue.serverTimestamp() },
-    });
-  } catch (updateError) {
-    console.error("Failed to record notification email status:", updateError);
-  }
-}
+import { notifyReportSubmitted, recordNotificationStatus } from "@/lib/resend-email";
+import { OFFICE_ADDRESS } from "@/lib/email-recipients";
 
 export async function GET() {
   const user = await getSessionUser();
@@ -141,6 +123,7 @@ export async function POST(req: Request) {
         preparedByName,
         preparedByTitle,
         observerId: user.uid,
+        observerRole: user.role,
         observerName: user.name,
         status: isDraft ? "draft" : "submitted",
         createdAt: FieldValue.serverTimestamp(),
@@ -161,22 +144,18 @@ export async function POST(req: Request) {
             observerName: user.name,
             status: "submitted",
           });
-          const result = await sendReportSubmissionEmail({
-            reportType: "Postmortem Report",
+          await notifyReportSubmitted(reportRef, { reportType: "postmortem", observerId: user.uid, observerRole: user.role }, {
+            reportTypeLabel: "Postmortem Report",
             observerName: user.name,
             date: postmortem.date,
             location: postmortem.animalCommonName,
-            reportId: reportRef.id,
             pdfBuffer,
             portalOrigin: new URL(req.url).origin,
+            sentBy: user.name,
           });
-          await recordNotificationStatus(reportRef, result);
         } catch (emailError) {
           console.error("Report submission email failed:", emailError);
-          await recordNotificationStatus(reportRef, {
-            ok: false,
-            error: emailError instanceof Error ? emailError.message : String(emailError),
-          });
+          await recordNotificationStatus(reportRef, [{ email: OFFICE_ADDRESS, ok: false, error: emailError instanceof Error ? emailError.message : String(emailError) }]);
         }
       }
 
@@ -218,6 +197,7 @@ export async function POST(req: Request) {
         date,
         unit,
         observerId: user.uid,
+        observerRole: user.role,
         observerName: user.name,
         status: isDraft ? "draft" : "submitted",
         createdAt: FieldValue.serverTimestamp(),
@@ -246,22 +226,18 @@ export async function POST(req: Request) {
             { date, unit, observerName: user.name, status: "submitted" },
             subUnitEntries as SubUnitEntryInput[]
           );
-          const result = await sendReportSubmissionEmail({
-            reportType: "Zoo Census Report",
+          await notifyReportSubmitted(reportRef, { reportType: "zoo_census", unit, observerId: user.uid, observerRole: user.role }, {
+            reportTypeLabel: "Zoo Census Report",
             observerName: user.name,
             date,
             location: unit,
-            reportId: reportRef.id,
             pdfBuffer,
             portalOrigin: new URL(req.url).origin,
+            sentBy: user.name,
           });
-          await recordNotificationStatus(reportRef, result);
         } catch (emailError) {
           console.error("Report submission email failed:", emailError);
-          await recordNotificationStatus(reportRef, {
-            ok: false,
-            error: emailError instanceof Error ? emailError.message : String(emailError),
-          });
+          await recordNotificationStatus(reportRef, [{ email: OFFICE_ADDRESS, ok: false, error: emailError instanceof Error ? emailError.message : String(emailError) }]);
         }
       }
 
@@ -303,6 +279,7 @@ export async function POST(req: Request) {
       project,
       site,
       observerId: user.uid,
+      observerRole: user.role,
       observerName: user.name,
       status: isDraft ? "draft" : "submitted",
       createdAt: FieldValue.serverTimestamp(),
@@ -324,22 +301,18 @@ export async function POST(req: Request) {
           { date, project, site, observerName: user.name, status: "submitted" },
           entries as ReportEntryInput[]
         );
-        const result = await sendReportSubmissionEmail({
-          reportType: "Capture Report",
-          observerName: user.name,
-          date,
-          location: `${project} · ${site}`,
-          reportId: reportRef.id,
-          pdfBuffer,
-          portalOrigin: new URL(req.url).origin,
-        });
-        await recordNotificationStatus(reportRef, result);
+        await notifyReportSubmitted(reportRef, { reportType: "capture", project, site, observerId: user.uid, observerRole: user.role }, {
+            reportTypeLabel: "Capture Report",
+            observerName: user.name,
+            date,
+            location: `${project} · ${site}`,
+            pdfBuffer,
+            portalOrigin: new URL(req.url).origin,
+            sentBy: user.name,
+          });
       } catch (emailError) {
         console.error("Report submission email failed:", emailError);
-        await recordNotificationStatus(reportRef, {
-          ok: false,
-          error: emailError instanceof Error ? emailError.message : String(emailError),
-        });
+        await recordNotificationStatus(reportRef, [{ email: OFFICE_ADDRESS, ok: false, error: emailError instanceof Error ? emailError.message : String(emailError) }]);
       }
     }
 

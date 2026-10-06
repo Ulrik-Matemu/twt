@@ -4,6 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
 import {
+  EMAIL_MANAGER_ROLES,
+  IMAGE_MANAGER_ROLES,
   REVIEWER_ROLES,
   type AnimalSex,
   type ReportEntryInput,
@@ -11,6 +13,9 @@ import {
   type SubUnitEntryInput,
 } from "@/lib/portal-types";
 import ReviewPanel from "./ReviewPanel";
+import ReportImagesManager from "./ReportImagesManager";
+import EmailPanel from "./EmailPanel";
+import { getReportEmailLog } from "@/lib/email-log-data";
 
 const STATUS_STYLES: Record<ReportStatus, string> = {
   draft: "bg-slate-100 text-slate-600",
@@ -59,6 +64,8 @@ export default async function ReportDetailPage({
   }
 
   const canEdit = canViewAll || isOwnDraft;
+  const canManageImages = hasRole(user, IMAGE_MANAGER_ROLES);
+  const emailLog = hasRole(user, EMAIL_MANAGER_ROLES) ? await getReportEmailLog(id) : null;
 
   return (
     <div className="space-y-6">
@@ -109,10 +116,12 @@ export default async function ReportDetailPage({
       {isZooCensus ? (
         <ZooCensusBody reportRef={reportDoc.ref} />
       ) : isPostmortem ? (
-        <PostmortemBody reportDoc={reportDoc} />
+        <PostmortemBody reportDoc={reportDoc} manageImages={canManageImages} />
       ) : (
-        <CaptureBody reportRef={reportDoc.ref} />
+        <CaptureBody reportRef={reportDoc.ref} manageImages={canManageImages} />
       )}
+
+      {emailLog && <EmailPanel reportId={id} log={emailLog} />}
 
       {canViewAll && (
         <ReviewPanel
@@ -127,8 +136,10 @@ export default async function ReportDetailPage({
 
 async function CaptureBody({
   reportRef,
+  manageImages,
 }: {
   reportRef: FirebaseFirestore.DocumentReference;
+  manageImages: boolean;
 }) {
   const entriesSnapshot = await reportRef.collection("entries").orderBy("createdAt").get();
   const entries = entriesSnapshot.docs.map((doc) => ({
@@ -173,7 +184,17 @@ async function CaptureBody({
             <p className="text-sm text-slate-800">{entry.doctorSummary}</p>
           </div>
 
-          {entry.imageUrls?.length > 0 && <ImageGrid label="Animal photos" urls={entry.imageUrls} />}
+          {(entry.imageUrls?.length > 0 || manageImages) && (
+            <ImageGrid
+              label="Animal photos"
+              urls={entry.imageUrls ?? []}
+              manage={
+                manageImages
+                  ? { reportId: reportRef.id, entryId: entry.id, field: "imageUrls" }
+                  : undefined
+              }
+            />
+          )}
 
           {entry.delivered && (
             <div className="border-t border-slate-100 pt-3 space-y-3">
@@ -186,8 +207,16 @@ async function CaptureBody({
                   </p>
                 )}
               </div>
-              {entry.deliveryImageUrl && (
-                <ImageGrid label="Delivery photo" urls={[entry.deliveryImageUrl]} />
+              {(entry.deliveryImageUrl || manageImages) && (
+                <ImageGrid
+                  label="Delivery photo"
+                  urls={entry.deliveryImageUrl ? [entry.deliveryImageUrl] : []}
+                  manage={
+                    manageImages
+                      ? { reportId: reportRef.id, entryId: entry.id, field: "deliveryImageUrl" }
+                      : undefined
+                  }
+                />
               )}
             </div>
           )}
@@ -199,8 +228,10 @@ async function CaptureBody({
 
 async function PostmortemBody({
   reportDoc,
+  manageImages,
 }: {
   reportDoc: FirebaseFirestore.DocumentSnapshot;
+  manageImages: boolean;
 }) {
   const report = reportDoc.data() as {
     location: string;
@@ -246,8 +277,14 @@ async function PostmortemBody({
       <Field label="Cause of death" value={report.causeOfDeath} block />
       <Field label="Recommendations" value={report.recommendations} block />
 
-      {report.imageUrls && report.imageUrls.length > 0 && (
-        <ImageGrid label="Photos" urls={report.imageUrls} />
+      {((report.imageUrls && report.imageUrls.length > 0) || manageImages) && (
+        <ImageGrid
+          label="Photos"
+          urls={report.imageUrls ?? []}
+          manage={
+            manageImages ? { reportId: reportDoc.id, field: "imageUrls" } : undefined
+          }
+        />
       )}
     </div>
   );
@@ -356,19 +393,58 @@ function Field({
   );
 }
 
-function ImageGrid({ label, urls }: { label: string; urls: string[] }) {
+// Admins get an editable photo manager (add/replace/delete); everyone else
+// gets a large, click-to-open grid.
+function ImageGrid({
+  label,
+  urls,
+  manage,
+}: {
+  label: string;
+  urls: string[];
+  manage?: {
+    reportId: string;
+    entryId?: string;
+    field: "imageUrls" | "deliveryImageUrl";
+  };
+}) {
+  if (manage) {
+    return (
+      <div className="space-y-3">
+        <ImageGridView label={label} urls={urls} />
+        <ReportImagesManager
+          reportId={manage.reportId}
+          entryId={manage.entryId}
+          field={manage.field}
+          label={label}
+          urls={urls}
+        />
+      </div>
+    );
+  }
+  return <ImageGridView label={label} urls={urls} />;
+}
+
+function ImageGridView({ label, urls }: { label: string; urls: string[] }) {
+  if (urls.length === 0) return null;
   return (
     <div>
       <p className="text-xs font-medium text-slate-500 mb-1.5">{label}</p>
-      <div className="flex gap-2 flex-wrap">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {urls.map((url) => (
-          <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+          <a
+            key={url}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+          >
             <Image
               src={url}
               alt={label}
-              width={96}
-              height={96}
-              className="w-24 h-24 rounded-lg object-cover border border-slate-200"
+              width={800}
+              height={600}
+              className="w-full h-64 object-contain"
               unoptimized
             />
           </a>

@@ -86,6 +86,9 @@ function addFooters(doc: PDFKit.PDFDocument) {
   const range = doc.bufferedPageRange();
   for (let i = range.start; i < range.start + range.count; i++) {
     doc.switchToPage(i);
+    // The footer sits inside the bottom margin; without this pdfkit treats
+    // it as overflow and appends a blank page after every real page.
+    doc.page.margins.bottom = 0;
     doc
       .font("Times-Roman")
       .fontSize(8)
@@ -98,6 +101,83 @@ function addFooters(doc: PDFKit.PDFDocument) {
       )
       .fillColor("#000000");
   }
+}
+
+interface PdfImage {
+  url: string;
+  caption: string;
+}
+
+// pdfkit only embeds JPEG/PNG, and gallery uploads can be HEIC/WebP/huge.
+// Cloudinary can convert + cap the size on delivery, which also keeps the
+// emailed PDF well under the attachment limit.
+function toPdfSafeUrl(url: string) {
+  return url.includes("/upload/") && !url.includes("/upload/f_")
+    ? url.replace("/upload/", "/upload/f_jpg,q_auto:good,w_1600,c_limit/")
+    : url;
+}
+
+async function fetchImageBuffer(url: string): Promise<Buffer | null> {
+  try {
+    const res = await fetch(toPdfSafeUrl(url), { cache: "no-store" });
+    if (!res.ok) return null;
+    return Buffer.from(await res.arrayBuffer());
+  } catch (error) {
+    console.error("Failed to fetch report image for PDF:", url, error);
+    return null;
+  }
+}
+
+// One photo per page, fitted large and centered, after the report body.
+async function appendImagePages(doc: PDFKit.PDFDocument, images: PdfImage[]) {
+  if (images.length === 0) return;
+
+  const buffers = await Promise.all(images.map((image) => fetchImageBuffer(image.url)));
+  const contentWidth = PAGE_WIDTH - MARGIN * 2;
+  const maxHeight = 620;
+  const total = buffers.filter(Boolean).length;
+  let shown = 0;
+
+  buffers.forEach((buffer, index) => {
+    if (!buffer) return;
+    shown += 1;
+
+    try {
+      // openImage exists at runtime but is missing from @types/pdfkit.
+      const img = (
+        doc as unknown as { openImage(src: Buffer): { width: number; height: number } }
+      ).openImage(buffer);
+      doc.addPage();
+
+      doc.font("Times-Bold").fontSize(12).fillColor("#000000").text("Photographic Record", MARGIN, MARGIN);
+      doc
+        .font("Times-Roman")
+        .fontSize(10)
+        .fillColor("#444444")
+        .text(`${images[index].caption}  ·  Photo ${shown} of ${total}`)
+        .fillColor("#000000");
+      doc.moveDown(0.4);
+      doc
+        .moveTo(MARGIN, doc.y)
+        .lineTo(MARGIN + contentWidth, doc.y)
+        .lineWidth(0.75)
+        .strokeColor("#1a1a1a")
+        .stroke();
+      doc.strokeColor("#000000");
+
+      const top = doc.y + 14;
+      const scale = Math.min(contentWidth / img.width, maxHeight / img.height, 1.5);
+      const width = img.width * scale;
+      const height = img.height * scale;
+      const x = MARGIN + (contentWidth - width) / 2;
+
+      doc.image(buffer, x, top, { width, height });
+      doc.rect(x, top, width, height).lineWidth(0.5).strokeColor("#cccccc").stroke();
+      doc.strokeColor("#000000");
+    } catch (error) {
+      console.error("Failed to embed report image in PDF:", images[index].url, error);
+    }
+  });
 }
 
 function newDocument(): PDFKit.PDFDocument {
@@ -156,6 +236,19 @@ export async function generateCaptureReportPdf(
     }
   });
 
+  await appendImagePages(
+    doc,
+    entries.flatMap((entry, index) => [
+      ...(entry.imageUrls ?? []).map((url, photoIndex) => ({
+        url,
+        caption: `${index + 1}. ${entry.animalName} — photo ${photoIndex + 1}`,
+      })),
+      ...(entry.deliveryImageUrl
+        ? [{ url: entry.deliveryImageUrl, caption: `${index + 1}. ${entry.animalName} — delivery photo` }]
+        : []),
+    ])
+  );
+
   return finalize(doc);
 }
 
@@ -193,6 +286,14 @@ export async function generatePostmortemReportPdf(
 
   drawSectionHeading(doc, "Recommendations");
   doc.font("Times-Roman").fontSize(10).text(report.recommendations || "—");
+
+  await appendImagePages(
+    doc,
+    (report.imageUrls ?? []).map((url) => ({
+      url,
+      caption: `${report.animalCommonName} — postmortem photo`,
+    }))
+  );
 
   return finalize(doc);
 }

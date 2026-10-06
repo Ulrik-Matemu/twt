@@ -1,33 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { checkForUpdate, useUpdateStatus } from "./update-store";
 
 const CHECK_INTERVAL_MS = 60_000;
 
 // Tells people with a stale tab that a new version has been deployed, so they
 // can reload instead of running old code (or submitting through an old form).
 export default function UpdateNotifier() {
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const status = useUpdateStatus();
 
   useEffect(() => {
-    const currentBuild = process.env.NEXT_PUBLIC_BUILD_ID;
-    if (!currentBuild || process.env.NODE_ENV !== "production") return;
+    if (!process.env.NEXT_PUBLIC_BUILD_ID || process.env.NODE_ENV !== "production") return;
 
-    let cancelled = false;
-
-    async function check() {
-      try {
-        const res = await fetch("/api/version", { cache: "no-store" });
-        if (!res.ok) return;
-        const { buildId } = (await res.json()) as { buildId: string | null };
-        if (!cancelled && buildId && buildId !== currentBuild) {
-          setUpdateAvailable(true);
-        }
-      } catch {
-        // Offline or transient failure — try again on the next tick.
-      }
-    }
-
+    const check = () => void checkForUpdate();
     const onVisible = () => {
       if (document.visibilityState === "visible") check();
     };
@@ -38,14 +24,13 @@ export default function UpdateNotifier() {
     check();
 
     return () => {
-      cancelled = true;
       clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", check);
     };
   }, []);
 
-  if (!updateAvailable) return null;
+  if (status !== "available") return null;
 
   return (
     <div

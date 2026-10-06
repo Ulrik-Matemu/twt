@@ -32,7 +32,7 @@ import {
   generatePostmortemReportPdf,
   generateZooCensusReportPdf,
 } from "@/lib/pdf/report-pdf";
-import { sendReportSubmissionEmail } from "@/lib/resend-email";
+import { notifyReportSubmitted } from "@/lib/resend-email";
 
 export async function GET(
   _req: Request,
@@ -208,14 +208,15 @@ export async function PATCH(
             observerName: user.name,
             status: "submitted",
           });
-          await sendReportSubmissionEmail({
-            reportType: "Postmortem Report",
+          await reportRef.update({ observerRole: user.role });
+          await notifyReportSubmitted(reportRef, { reportType: "postmortem", observerId: report.observerId, observerRole: user.role }, {
+            reportTypeLabel: "Postmortem Report",
             observerName: user.name,
             date: postmortem.date,
             location: postmortem.animalCommonName,
-            reportId: id,
             pdfBuffer,
             portalOrigin: new URL(req.url).origin,
+            sentBy: user.name,
           });
         } catch (emailError) {
           console.error("Report submission email failed:", emailError);
@@ -283,14 +284,15 @@ export async function PATCH(
             { date, unit, observerName: user.name, status: "submitted" },
             subUnitEntries as SubUnitEntryInput[]
           );
-          await sendReportSubmissionEmail({
-            reportType: "Zoo Census Report",
+          await reportRef.update({ observerRole: user.role });
+          await notifyReportSubmitted(reportRef, { reportType: "zoo_census", unit, observerId: report.observerId, observerRole: user.role }, {
+            reportTypeLabel: "Zoo Census Report",
             observerName: user.name,
-            date,
+            date: date,
             location: unit,
-            reportId: id,
             pdfBuffer,
             portalOrigin: new URL(req.url).origin,
+            sentBy: user.name,
           });
         } catch (emailError) {
           console.error("Report submission email failed:", emailError);
@@ -354,15 +356,16 @@ export async function PATCH(
           { date, project, site, observerName: user.name, status: "submitted" },
           entries as ReportEntryInput[]
         );
-        await sendReportSubmissionEmail({
-          reportType: "Capture Report",
-          observerName: user.name,
-          date,
-          location: `${project} · ${site}`,
-          reportId: id,
-          pdfBuffer,
-          portalOrigin: new URL(req.url).origin,
-        });
+        await reportRef.update({ observerRole: user.role });
+          await notifyReportSubmitted(reportRef, { reportType: "capture", project, site, observerId: report.observerId, observerRole: user.role }, {
+            reportTypeLabel: "Capture Report",
+            observerName: user.name,
+            date: date,
+            location: `${project} · ${site}`,
+            pdfBuffer,
+            portalOrigin: new URL(req.url).origin,
+            sentBy: user.name,
+          });
       } catch (emailError) {
         console.error("Report submission email failed:", emailError);
       }

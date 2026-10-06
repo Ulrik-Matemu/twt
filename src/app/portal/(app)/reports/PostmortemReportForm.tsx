@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, Loader2 } from "lucide-react";
 import { uploadImage } from "@/lib/cloudinary-client";
+import ImageUploadField from "./ImageUploadField";
 import type { AnimalSex } from "@/lib/portal-types";
 
 export interface PostmortemReportFormInitial {
@@ -307,56 +307,6 @@ function LabeledTextarea({
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#d6852b] focus:border-transparent"
       />
-    </div>
-  );
-}
-
-function ImageUploadField({
-  urls,
-  uploading,
-  onFiles,
-  onRemove,
-}: {
-  urls: string[];
-  uploading: boolean;
-  onFiles: (files: FileList | null) => void;
-  onRemove: (url: string) => void;
-}) {
-  return (
-    <div className="flex gap-2 flex-wrap">
-      {urls.map((url) => (
-        <div key={url} className="relative w-20 h-20">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={url}
-            alt="Postmortem photo"
-            className="w-20 h-20 rounded-lg object-cover border border-slate-200"
-          />
-          <button
-            type="button"
-            onClick={() => onRemove(url)}
-            className="absolute -top-1.5 -right-1.5 bg-slate-900 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-          >
-            &times;
-          </button>
-        </div>
-      ))}
-
-      <label className="w-20 h-20 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-[#d6852b] transition-colors">
-        {uploading ? (
-          <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
-        ) : (
-          <Upload className="w-5 h-5 text-slate-400" />
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          multiple
-          onChange={(e) => onFiles(e.target.files)}
-          className="hidden"
-        />
-      </label>
     </div>
   );
 }

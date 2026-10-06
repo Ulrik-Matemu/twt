@@ -13,6 +13,10 @@ export const POSTMORTEM_AUTHOR_ROLES: PortalRole[] = DOCTOR_ROLES;
 export const REVIEWER_ROLES: PortalRole[] = ["admin", "office_manager", "admin_doctor"];
 export const CATALOG_MANAGER_ROLES: PortalRole[] = ["admin", "office_manager"];
 export const USER_MANAGER_ROLES: PortalRole[] = ["admin"];
+// Add/replace/delete photos on any report, including submitted ones.
+export const IMAGE_MANAGER_ROLES: PortalRole[] = ["admin"];
+// Manage report-email recipients/filters, view delivery status, forward reports.
+export const EMAIL_MANAGER_ROLES: PortalRole[] = ["admin"];
 
 export const PORTAL_ROLE_LABELS: Record<PortalRole, string> = {
   admin: "Admin",
