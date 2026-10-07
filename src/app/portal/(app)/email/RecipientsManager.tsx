@@ -33,7 +33,7 @@ function summarize(filters: RecipientFilters, doctors: Props["doctors"]) {
   if (filters.sites.length) parts.push(`site: ${filters.sites.join(", ")}`);
   if (filters.observerIds.length)
     parts.push(
-      `doctor: ${filters.observerIds.map((id) => doctors.find((d) => d.id === id)?.name ?? "Unknown").join(", ")}`
+      `vet: ${filters.observerIds.map((id) => doctors.find((d) => d.id === id)?.name ?? "Unknown").join(", ")}`
     );
   if (filters.observerRoles.length)
     parts.push(filters.observerRoles.map((r) => PORTAL_ROLE_LABELS[r]).join(" / "));
@@ -214,8 +214,8 @@ function RecipientForm({
         ))}
       </ChipGroup>
 
-      <ChipGroup label="Submitted by doctor">
-        {doctors.length === 0 && <span className="text-xs text-slate-400">No doctor accounts yet</span>}
+      <ChipGroup label="Submitted by vet">
+        {doctors.length === 0 && <span className="text-xs text-slate-400">No vet accounts yet</span>}
         {doctors.map((d) => (
           <Chip key={d.id} active={filters.observerIds.includes(d.id)} onClick={() => toggle("observerIds", d.id)}>
             {d.name}

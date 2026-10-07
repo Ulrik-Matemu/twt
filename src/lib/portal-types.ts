@@ -1,3 +1,6 @@
+// The *_doctor keys are persisted identifiers (Firebase Auth custom claims,
+// users.role, activity_logs.userRole, reports.observerRole, email recipient
+// filters) — never rename them. Only PORTAL_ROLE_LABELS is user-facing.
 export type PortalRole =
   | "admin"
   | "office_manager"
@@ -7,8 +10,8 @@ export type PortalRole =
 
 export const DOCTOR_ROLES: PortalRole[] = ["admin_doctor", "zoo_doctor", "field_doctor"];
 export const REPORT_AUTHOR_ROLES: PortalRole[] = ["zoo_doctor", "field_doctor"];
-// Postmortem reports can be authored by any doctor, unlike capture/zoo
-// census reports which are each tied to one specific doctor role.
+// Postmortem reports can be authored by any vet, unlike capture/zoo
+// census reports which are each tied to one specific vet role.
 export const POSTMORTEM_AUTHOR_ROLES: PortalRole[] = DOCTOR_ROLES;
 export const REVIEWER_ROLES: PortalRole[] = ["admin", "office_manager", "admin_doctor"];
 export const CATALOG_MANAGER_ROLES: PortalRole[] = ["admin", "office_manager"];
@@ -21,10 +24,16 @@ export const EMAIL_MANAGER_ROLES: PortalRole[] = ["admin"];
 export const PORTAL_ROLE_LABELS: Record<PortalRole, string> = {
   admin: "Admin",
   office_manager: "Office Manager",
-  admin_doctor: "Admin Doctor",
-  zoo_doctor: "Zoo Doctor",
-  field_doctor: "Field Doctor",
+  admin_doctor: "Admin Vet",
+  zoo_doctor: "Zoo Vet",
+  field_doctor: "Field Vet",
 };
+
+// preparedByTitle on older reports stores the old label text ("Zoo Doctor");
+// remap it when displayed so the stored data never has to be rewritten.
+export function displayRoleTitle(title?: string | null): string {
+  return (title ?? "").replace(/\bDoctor\b/g, "Vet");
+}
 
 export interface PortalSessionUser {
   uid: string;
@@ -55,7 +64,7 @@ export interface ReportEntryInput {
   deliveredAt?: string;
 }
 
-// Draft entries can be partially filled in (a doctor may not have every
+// Draft entries can be partially filled in (a vet may not have every
 // detail yet), so only the animal identity is guaranteed present.
 export type ReportEntryDraftInput = Partial<ReportEntryInput> & {
   animalId: string;
@@ -132,7 +141,7 @@ export interface PostmortemReportInput {
   causeOfDeath: string;
   recommendations: string;
   imageUrls: string[];
-  // Never client-editable — set from the submitting doctor's session
+  // Never client-editable — set from the submitting vet's session
   // (name + role label) at creation time, so the "prepared by" line always
   // reflects who was actually logged in, not free text a form could fake.
   preparedByName: string;

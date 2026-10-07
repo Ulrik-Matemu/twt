@@ -64,7 +64,7 @@ export function validateEntries(entries: unknown): entries is ReportEntryInput[]
 }
 
 // Lenient validation — a draft only needs an animal identity per entry;
-// everything else may be missing while the doctor fills it in later.
+// everything else may be missing while the vet fills it in later.
 export function validateDraftEntries(entries: unknown): entries is Record<string, unknown>[] {
   if (!Array.isArray(entries)) return false;
 

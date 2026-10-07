@@ -4,6 +4,7 @@ import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
 import {
   REVIEWER_ROLES,
+  displayRoleTitle,
   type AnimalSex,
   type ReportEntryInput,
   type ReportStatus,
@@ -106,7 +107,7 @@ export default async function PrintReportPage({
             <dt className="text-xs font-medium text-slate-500">Prepared by</dt>
             <dd className="text-slate-900">
               {report.preparedByTitle
-                ? `${report.preparedByName} — ${report.preparedByTitle}`
+                ? `${report.preparedByName} — ${displayRoleTitle(report.preparedByTitle)}`
                 : report.preparedByName}
             </dd>
           </div>
@@ -209,7 +210,7 @@ export default async function PrintReportPage({
               "Site of capture",
               "Capture date/time",
               "Condition",
-              "Doctor's summary",
+              "Vet's summary",
               "Delivered",
               "Delivery summary",
             ].map((h) => (

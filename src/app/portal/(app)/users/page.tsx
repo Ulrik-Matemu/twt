@@ -17,7 +17,7 @@ export default async function UsersPage() {
       <div>
         <h1 className="text-xl font-semibold text-slate-900">User accounts</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Create login accounts for doctors and office managers.
+          Create login accounts for vets and office managers.
         </p>
       </div>
       <UsersManager users={users} />

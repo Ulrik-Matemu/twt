@@ -7,6 +7,7 @@ import {
   EMAIL_MANAGER_ROLES,
   IMAGE_MANAGER_ROLES,
   REVIEWER_ROLES,
+  displayRoleTitle,
   type AnimalSex,
   type ReportEntryInput,
   type ReportStatus,
@@ -57,7 +58,7 @@ export default async function ReportDetailPage({
   const isOwnDraft = isAuthor && report.status === "draft";
 
   // Once a report leaves draft status, only reviewers (admin, office_manager,
-  // admin_doctor) can view its full details — an author only sees it in the
+  // admin_doctor, i.e. Admin Vet) can view its full details — an author only sees it in the
   // reports list ("history") while it's their own submitted report.
   if (!canViewAll && !isOwnDraft) {
     redirect("/portal/reports");
@@ -180,7 +181,7 @@ async function CaptureBody({
           </div>
 
           <div>
-            <p className="text-xs font-medium text-slate-500 mb-1">Doctor&apos;s summary</p>
+            <p className="text-xs font-medium text-slate-500 mb-1">Vet&apos;s summary</p>
             <p className="text-sm text-slate-800">{entry.doctorSummary}</p>
           </div>
 
@@ -266,7 +267,7 @@ async function PostmortemBody({
           label="Prepared by"
           value={
             report.preparedByTitle
-              ? `${report.preparedByName} — ${report.preparedByTitle}`
+              ? `${report.preparedByName} — ${displayRoleTitle(report.preparedByTitle)}`
               : report.preparedByName
           }
         />

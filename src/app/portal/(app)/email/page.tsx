@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser, requireRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
-import { EMAIL_MANAGER_ROLES } from "@/lib/portal-types";
+import { DOCTOR_ROLES, EMAIL_MANAGER_ROLES } from "@/lib/portal-types";
 import { getRecipients } from "@/lib/email-recipients";
 import { getRecentEmailLog } from "@/lib/email-log-data";
 import { getUsers } from "@/lib/users-data";
@@ -49,7 +49,7 @@ export default async function EmailPage() {
       <RecipientsManager
         recipients={recipients}
         doctors={users
-          .filter((u) => u.role.includes("doctor"))
+          .filter((u) => DOCTOR_ROLES.includes(u.role))
           .map((u) => ({ id: u.id, name: u.name }))}
         suggestions={{
           units: distinct("unit"),

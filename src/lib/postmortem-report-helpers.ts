@@ -2,7 +2,7 @@ import type { PostmortemReportInput } from "./portal-types";
 
 // The shape a client actually submits — everything except `preparedByName`/
 // `preparedByTitle`, which the server always derives from the submitting
-// doctor's session (see route handlers) rather than trusting the client.
+// vet's session (see route handlers) rather than trusting the client.
 export type PostmortemReportClientInput = Omit<
   PostmortemReportInput,
   "preparedByName" | "preparedByTitle"
@@ -51,7 +51,7 @@ export function validatePostmortemReport(body: unknown): body is PostmortemRepor
 }
 
 // Lenient validation — a draft only needs the animal identity and exam
-// date; everything else may be missing while the doctor fills it in later.
+// date; everything else may be missing while the vet fills it in later.
 export function validatePostmortemDraft(
   body: unknown
 ): body is { date: string; animalCommonName: string } {

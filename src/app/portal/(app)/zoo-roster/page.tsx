@@ -18,7 +18,7 @@ export default async function ZooRosterPage() {
         <h1 className="text-xl font-semibold text-slate-900">Zoo roster</h1>
         <p className="text-sm text-slate-500 mt-1">
           Set up sub-units (species groups) and the named animals in each. The
-          zoo doctor picks from this roster when filing the daily census
+          zoo vet picks from this roster when filing the daily census
           report.
         </p>
       </div>

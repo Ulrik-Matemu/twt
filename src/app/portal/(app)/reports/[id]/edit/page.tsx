@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser, hasRole } from "@/lib/portal-auth";
 import { adminDb } from "@/lib/firebase-admin";
-import { REVIEWER_ROLES, type AgeGroup, type AnimalSex, type ReportStatus } from "@/lib/portal-types";
+import { REVIEWER_ROLES, displayRoleTitle, type AgeGroup, type AnimalSex, type ReportStatus } from "@/lib/portal-types";
 import { getAnimals } from "@/lib/animals-data";
 import { getZooSubunits } from "@/lib/zoo-roster-data";
 import ReportForm, { type EntryDraft } from "../../ReportForm";
@@ -64,7 +64,7 @@ export default async function EditReportPage({
         }}
         // "Prepared by" is fixed at creation time — editing (even by a
         // reviewer) never reassigns who examined the animal.
-        preparedBy={{ name: report.preparedByName || user.name, title: report.preparedByTitle || "" }}
+        preparedBy={{ name: report.preparedByName || user.name, title: displayRoleTitle(report.preparedByTitle) }}
       />
     );
   }

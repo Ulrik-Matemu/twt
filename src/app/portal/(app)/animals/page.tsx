@@ -17,7 +17,7 @@ export default async function AnimalsPage() {
       <div>
         <h1 className="text-xl font-semibold text-slate-900">Animal catalog</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Register animal names here. Doctors will select from this list and
+          Register animal names here. Vets will select from this list and
           fill in the rest of the details for each daily report.
         </p>
       </div>

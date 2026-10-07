@@ -100,7 +100,7 @@ export async function POST(req: Request) {
       }
 
       // "Prepared by" always reflects who is actually logged in — the
-      // submitting doctor's session name and role — never anything the
+      // submitting vet's session name and role — never anything the
       // client could send.
       const preparedByName = user.name;
       const preparedByTitle = PORTAL_ROLE_LABELS[user.role];

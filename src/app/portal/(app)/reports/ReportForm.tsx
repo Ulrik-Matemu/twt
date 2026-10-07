@@ -483,7 +483,7 @@ function EntryCard({
 
       <div>
         <label className="block text-xs font-medium text-slate-500 mb-1">
-          Doctor&apos;s summary / comment
+          Vet&apos;s summary / comment
         </label>
         <textarea
           rows={2}

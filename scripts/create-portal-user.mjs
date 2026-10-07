@@ -7,6 +7,7 @@
 //     --name "Ahmed Magram" --email office@twt.co.tz --password "..." --role admin
 //
 // Valid --role values: admin, office_manager, admin_doctor, zoo_doctor, field_doctor
+// (the *_doctor keys are stored identifiers; the portal UI labels them "Vet")
 
 import { cert, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";

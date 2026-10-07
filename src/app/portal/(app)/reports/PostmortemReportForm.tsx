@@ -32,7 +32,7 @@ export default function PostmortemReportForm({
   reportId?: string;
   initial: PostmortemReportFormInitial;
   // Who "prepared" the report is never a text field the form lets you
-  // type — it's the submitting doctor's session identity (name + role),
+  // type — it's the submitting vet's session identity (name + role),
   // detected server-side and only ever displayed here.
   preparedBy: { name: string; title: string };
 }) {

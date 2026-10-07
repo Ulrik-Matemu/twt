@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import PDFDocument from "pdfkit";
-import type { PostmortemReportInput, ReportEntryInput, SubUnitEntryInput } from "@/lib/portal-types";
+import { displayRoleTitle, type PostmortemReportInput, type ReportEntryInput, type SubUnitEntryInput } from "@/lib/portal-types";
 
 const LOGO_PATH = path.join(process.cwd(), "public", "twt-logo-removebg-preview.png");
 const MARGIN = 50;
@@ -223,7 +223,7 @@ export async function generateCaptureReportPdf(
     drawLabeledLine(doc, "Site of capture", entry.siteOfCapture);
     drawLabeledLine(doc, "Capture date/time", entry.captureDateTime);
     drawLabeledLine(doc, "Condition", entry.condition);
-    drawLabeledLine(doc, "Doctor's summary", entry.doctorSummary);
+    drawLabeledLine(doc, "Vet's summary", entry.doctorSummary);
 
     if (entry.delivered) {
       const deliveredAt = entry.deliveredAt
@@ -271,7 +271,7 @@ export async function generatePostmortemReportPdf(
   drawLabeledLine(
     doc,
     "Prepared by",
-    report.preparedByTitle ? `${report.preparedByName} — ${report.preparedByTitle}` : report.preparedByName
+    report.preparedByTitle ? `${report.preparedByName} — ${displayRoleTitle(report.preparedByTitle)}` : report.preparedByName
   );
   doc.moveDown(0.5);
 
